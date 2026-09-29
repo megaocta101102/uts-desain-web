@@ -16,10 +16,12 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, isOpen, onClo
     window.print();
   };
 
-  const formattedDate = new Date(order.created_at).toLocaleString('id-ID', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
+  const formattedDate = order.created_at
+    ? new Date(order.created_at).toLocaleString('id-ID', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      })
+    : new Date().toLocaleString('id-ID');
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
@@ -82,15 +84,15 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, isOpen, onClo
 
             {/* Items */}
             <div className="space-y-2 border-b border-dashed border-slate-300 pb-3">
-              {order.items.map((item, idx) => (
+              {(order.items || []).map((item, idx) => (
                 <div key={idx} className="space-y-0.5">
                   <div className="flex justify-between text-slate-900 font-semibold">
-                    <span>{item.quantity}x {item.menu_name}</span>
-                    <span>{formatCurrency(item.subtotal)}</span>
+                    <span>{item?.quantity || 1}x {item?.menu_name || 'Item'}</span>
+                    <span>{formatCurrency(item?.subtotal || 0)}</span>
                   </div>
-                  {item.toppings && item.toppings.length > 0 && (
+                  {item?.toppings && item.toppings.length > 0 && (
                     <div className="text-[10px] text-slate-500 pl-3">
-                      + {item.toppings.map((t) => t.name).join(', ')}
+                      + {item.toppings.map((t) => t?.name || '').filter(Boolean).join(', ')}
                     </div>
                   )}
                 </div>

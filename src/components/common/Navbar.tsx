@@ -107,10 +107,10 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex flex-col text-right">
                 <span className="text-sm font-bold text-slate-800 leading-tight">
-                  {user.name}
+                  {user?.name || user?.username || 'User'}
                 </span>
                 <span className="text-xs text-blue-600 uppercase font-bold tracking-wider">
-                  {user.role}
+                  {user?.role || 'kasir'}
                 </span>
               </div>
 

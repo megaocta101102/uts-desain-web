@@ -160,8 +160,16 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(data));
-            return data;
+            const sanitized = data.map((u: any) => ({
+              ...u,
+              id: u.id || `usr-${Date.now()}`,
+              name: u.name || u.username || 'Kasir',
+              username: u.username || 'kasir',
+              role: u.role || 'kasir',
+              status: u.status || 'aktif',
+            }));
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(sanitized));
+            return sanitized;
           }
         }
       } catch (err) {
@@ -169,7 +177,15 @@ class DatabaseService {
       }
     }
     const local = localStorage.getItem(STORAGE_KEYS.USERS);
-    return local ? JSON.parse(local) : INITIAL_USERS;
+    const parsed = local ? JSON.parse(local) : INITIAL_USERS;
+    return (Array.isArray(parsed) ? parsed : INITIAL_USERS).map((u: any) => ({
+      ...u,
+      id: u.id || `usr-${Date.now()}`,
+      name: u.name || u.username || 'Kasir',
+      username: u.username || 'kasir',
+      role: u.role || 'kasir',
+      status: u.status || 'aktif',
+    }));
   }
 
   async insertUser(user: Partial<User>): Promise<User> {

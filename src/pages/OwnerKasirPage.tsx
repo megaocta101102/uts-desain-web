@@ -7,7 +7,6 @@ import {
   Lock,
   User,
   Shield,
-  CheckCircle,
   AlertCircle,
   KeyRound
 } from 'lucide-react';
@@ -34,7 +33,15 @@ export const OwnerKasirPage: React.FC = () => {
   const loadUsers = async () => {
     try {
       const data = await db.getUsers();
-      setUsers(data);
+      // Ensure data is valid array and each user has safe fallbacks
+      const sanitized = (Array.isArray(data) ? data : []).map((u) => ({
+        ...u,
+        name: u.name || u.username || 'Kasir',
+        username: u.username || 'kasir',
+        role: (u.role || 'kasir') as 'kasir' | 'owner',
+        status: (u.status || 'aktif') as 'aktif' | 'nonaktif',
+      }));
+      setUsers(sanitized);
     } catch (err) {
       console.error('Failed to load users', err);
     } finally {
@@ -63,11 +70,11 @@ export const OwnerKasirPage: React.FC = () => {
   const handleOpenEdit = (u: UserType) => {
     setEditingUser(u);
     setUserForm({
-      username: u.username,
-      password: u.password || '',
-      name: u.name,
-      role: u.role,
-      status: (u.status as 'aktif' | 'nonaktif') || 'aktif',
+      username: u?.username || '',
+      password: u?.password || '',
+      name: u?.name || u?.username || '',
+      role: u?.role || 'kasir',
+      status: (u?.status as 'aktif' | 'nonaktif') || 'aktif',
     });
     setErrorMsg('');
     setSuccessMsg('');
@@ -94,7 +101,7 @@ export const OwnerKasirPage: React.FC = () => {
       } else {
         // Check duplicate
         const exists = users.some(
-          (u) => u.username.toLowerCase() === userForm.username.trim().toLowerCase()
+          (u) => (u?.username || '').toLowerCase() === userForm.username.trim().toLowerCase()
         );
         if (exists) {
           setErrorMsg('Username ini sudah digunakan, silakan pilih username lain.');
@@ -131,6 +138,11 @@ export const OwnerKasirPage: React.FC = () => {
     }
   };
 
+  const getInitialChar = (u: UserType) => {
+    const raw = u?.name || u?.username || 'K';
+    return raw.trim().charAt(0).toUpperCase() || 'K';
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
@@ -160,78 +172,88 @@ export const OwnerKasirPage: React.FC = () => {
 
       {/* Users Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {users.map((u) => (
-          <div
-            key={u.id}
-            className="clay-card p-6 bg-white border border-blue-100 flex flex-col justify-between space-y-5"
-          >
-            <div>
-              <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                  {u.name.charAt(0).toUpperCase()}
+        {users.map((u) => {
+          const displayName = u?.name || u?.username || 'Kasir';
+          const displayUsername = u?.username || 'kasir';
+          const displayRole = u?.role || 'kasir';
+          const displayStatus = u?.status || 'aktif';
+          const initial = getInitialChar(u);
+
+          return (
+            <div
+              key={u?.id || Math.random().toString()}
+              className="clay-card p-6 bg-white border border-blue-100 flex flex-col justify-between space-y-5"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                    {initial}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        displayRole === 'owner'
+                          ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                          : 'bg-blue-100 text-blue-800 border border-blue-200'
+                      }`}
+                    >
+                      {displayRole}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${
+                        displayStatus === 'nonaktif'
+                          ? 'bg-red-100 text-red-700'
+                          : 'bg-emerald-100 text-emerald-700'
+                      }`}
+                    >
+                      {displayStatus}
+                    </span>
+                  </div>
                 </div>
+
+                <div className="mt-4 space-y-1">
+                  <h3 className="font-extrabold text-slate-900 text-lg font-sans">
+                    {displayName}
+                  </h3>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Username: <strong>{displayUsername}</strong></span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                    <KeyRound className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Password: <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-800 font-mono">{u?.password || '••••••••'}</code></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <span className="text-[11px] text-slate-400">
+                  {u?.created_at ? new Date(u.created_at).toLocaleDateString('id-ID') : 'Sistem Utama'}
+                </span>
+
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      u.role === 'owner'
-                        ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                        : 'bg-blue-100 text-blue-800 border border-blue-200'
-                    }`}
-                  >
-                    {u.role}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${
-                      u.status === 'nonaktif'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-emerald-100 text-emerald-700'
-                    }`}
-                  >
-                    {u.status || 'aktif'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="mt-4 space-y-1">
-                <h3 className="font-extrabold text-slate-900 text-lg font-sans">{u.name}</h3>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <User className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Username: <strong>{u.username}</strong></span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500">
-                  <KeyRound className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Password: <code className="bg-slate-100 px-1.5 py-0.5 rounded text-slate-800 font-mono">{u.password || '••••••••'}</code></span>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[11px] text-slate-400">
-                {u.created_at ? new Date(u.created_at).toLocaleDateString('id-ID') : 'Sistem Utama'}
-              </span>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleOpenEdit(u)}
-                  className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs font-semibold flex items-center gap-1"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  Edit
-                </button>
-                {u.role !== 'owner' && (
                   <button
-                    onClick={() => handleDelete(u.id, u.name, u.role)}
-                    className="p-2 rounded-full text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
-                    title="Hapus Kasir"
+                    onClick={() => handleOpenEdit(u)}
+                    className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs font-semibold flex items-center gap-1"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Edit2 className="w-3.5 h-3.5" />
+                    Edit
                   </button>
-                )}
+                  {displayRole !== 'owner' && (
+                    <button
+                      onClick={() => handleDelete(u.id, displayName, displayRole)}
+                      className="p-2 rounded-full text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+                      title="Hapus Kasir"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Add / Edit Cashier Modal */}
