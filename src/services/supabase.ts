@@ -8,7 +8,6 @@ const STORAGE_KEYS = {
   ORDERS: 'meo_orders_v2',
 };
 
-// Default seed data
 export const INITIAL_MENUS: MenuItem[] = [
   {
     id: 'm-1',
@@ -160,13 +159,14 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            const sanitized = data.map((u: any) => ({
-              ...u,
+            const sanitized: User[] = data.map((u: any) => ({
               id: u.id || `usr-${Date.now()}`,
-              name: u.name || u.username || 'Kasir',
+              name: u.full_name || u.name || u.username || 'Kasir',
               username: u.username || 'kasir',
-              role: u.role || 'kasir',
+              password: u.password || '',
+              role: (u.role || 'kasir') as 'owner' | 'kasir',
               status: u.status || 'aktif',
+              created_at: u.created_at || new Date().toISOString(),
             }));
             localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(sanitized));
             return sanitized;
@@ -179,12 +179,13 @@ class DatabaseService {
     const local = localStorage.getItem(STORAGE_KEYS.USERS);
     const parsed = local ? JSON.parse(local) : INITIAL_USERS;
     return (Array.isArray(parsed) ? parsed : INITIAL_USERS).map((u: any) => ({
-      ...u,
       id: u.id || `usr-${Date.now()}`,
-      name: u.name || u.username || 'Kasir',
+      name: u.full_name || u.name || u.username || 'Kasir',
       username: u.username || 'kasir',
-      role: u.role || 'kasir',
+      password: u.password || '',
+      role: (u.role || 'kasir') as 'owner' | 'kasir',
       status: u.status || 'aktif',
+      created_at: u.created_at || new Date().toISOString(),
     }));
   }
 
@@ -193,27 +194,22 @@ class DatabaseService {
     const newUser: User = {
       id: user.id || `usr-${Date.now()}`,
       username: user.username?.trim().toLowerCase() || '',
-      password: user.password || '',
-      name: user.name || user.username || 'Kasir',
+      password: user.password?.trim() || '',
+      name: (user.name || (user as any).full_name || user.username || 'Kasir').trim(),
       role: user.role || 'kasir',
       status: user.status || 'aktif',
       created_at: new Date().toISOString(),
     };
 
-    // Try Supabase insert
+    // Try Supabase insert matching Postgres schema (full_name column)
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        const payload: Record<string, any> = {
+        const payload = {
           username: newUser.username,
           password: newUser.password,
-          name: newUser.name,
+          full_name: newUser.name,
           role: newUser.role,
-          status: newUser.status,
         };
-        // only include id if uuid valid, else let db generate
-        if (newUser.id.length === 36 && newUser.id.includes('-')) {
-          payload.id = newUser.id;
-        }
 
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/users`, {
           method: 'POST',
@@ -225,9 +221,12 @@ class DatabaseService {
           if (created && created[0]) {
             newUser.id = created[0].id;
           }
+        } else {
+          const errText = await res.text();
+          console.warn('Supabase insert user responded with error:', res.status, errText);
         }
       } catch (err) {
-        console.warn('Supabase insert user failed, saved locally', err);
+        console.warn('Supabase insert user network failed, saved locally', err);
       }
     }
 
@@ -241,10 +240,20 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?id=eq.${id}`, {
+        const payload: Record<string, any> = {};
+        if (user.username) payload.username = user.username.trim().toLowerCase();
+        if (user.password) payload.password = user.password.trim();
+        if (user.name || (user as any).full_name) {
+          payload.full_name = (user.name || (user as any).full_name).trim();
+        }
+        if (user.role) payload.role = user.role;
+
+        // If id is uuid, update by id, else by username
+        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `username=eq.${user.username}`;
+        await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?${query}`, {
           method: 'PATCH',
           headers: this.getHeaders(),
-          body: JSON.stringify(user),
+          body: JSON.stringify(payload),
         });
       } catch (err) {
         console.warn('Supabase update user failed, updated locally', err);
@@ -255,7 +264,11 @@ class DatabaseService {
     let updatedUser: User | null = null;
     const updatedList = current.map((u) => {
       if (u.id === id || u.username === user.username) {
-        updatedUser = { ...u, ...user };
+        updatedUser = {
+          ...u,
+          ...user,
+          name: user.name || (user as any).full_name || u.name,
+        };
         return updatedUser;
       }
       return u;
@@ -268,7 +281,8 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?id=eq.${id}`, {
+        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `username=eq.${id}`;
+        await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?${query}`, {
           method: 'DELETE',
           headers: this.getHeaders(),
         });
@@ -278,7 +292,7 @@ class DatabaseService {
     }
 
     const current = await this.getUsers();
-    const updated = current.filter((u) => u.id !== id);
+    const updated = current.filter((u) => u.id !== id && u.username !== id);
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updated));
     return true;
   }
@@ -294,8 +308,18 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.MENUS, JSON.stringify(data));
-            return data;
+            const sanitized: MenuItem[] = data.map((m: any) => ({
+              id: m.id || `m-${Date.now()}`,
+              name: m.name || '',
+              category: (m.category || m.type || 'minuman') as 'minuman' | 'makanan' | 'snack',
+              price: Number(m.price) || 0,
+              description: m.description || '',
+              image_url: m.image_url || '/assets/images/coffee_signature.jpg',
+              status: m.is_available === false ? 'habis' : 'tersedia',
+              created_at: m.created_at || new Date().toISOString(),
+            }));
+            localStorage.setItem(STORAGE_KEYS.MENUS, JSON.stringify(sanitized));
+            return sanitized;
           }
         }
       } catch (err) {
@@ -321,10 +345,20 @@ class DatabaseService {
 
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
+        const payload = {
+          name: newItem.name,
+          price: newItem.price,
+          description: newItem.description,
+          type: newItem.category,
+          category: newItem.category,
+          image_url: newItem.image_url,
+          is_available: newItem.status === 'tersedia',
+        };
+
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus`, {
           method: 'POST',
           headers: this.getHeaders(),
-          body: JSON.stringify(newItem),
+          body: JSON.stringify(payload),
         });
         if (res.ok) {
           const data = await res.json();
@@ -345,10 +379,22 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus?id=eq.${id}`, {
+        const payload: Record<string, any> = {};
+        if (item.name) payload.name = item.name;
+        if (item.price !== undefined) payload.price = Number(item.price);
+        if (item.description !== undefined) payload.description = item.description;
+        if (item.category) {
+          payload.category = item.category;
+          payload.type = item.category;
+        }
+        if (item.image_url) payload.image_url = item.image_url;
+        if (item.status) payload.is_available = item.status === 'tersedia';
+
+        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `name=eq.${item.name}`;
+        await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus?${query}`, {
           method: 'PATCH',
           headers: this.getHeaders(),
-          body: JSON.stringify(item),
+          body: JSON.stringify(payload),
         });
       } catch (err) {
         console.warn('Supabase update menu failed', err);
@@ -358,7 +404,7 @@ class DatabaseService {
     const current = await this.getMenus();
     let updatedItem: MenuItem | null = null;
     const updated = current.map((m) => {
-      if (m.id === id) {
+      if (m.id === id || (item.name && m.name === item.name)) {
         updatedItem = { ...m, ...item };
         return updatedItem;
       }
@@ -372,7 +418,8 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus?id=eq.${id}`, {
+        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `name=eq.${id}`;
+        await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus?${query}`, {
           method: 'DELETE',
           headers: this.getHeaders(),
         });
@@ -398,8 +445,16 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            localStorage.setItem(STORAGE_KEYS.TOPPINGS, JSON.stringify(data));
-            return data;
+            const sanitized: Topping[] = data.map((t: any) => ({
+              id: t.id || `t-${Date.now()}`,
+              name: t.name || '',
+              price: Number(t.price) || 0,
+              category: t.category || 'all',
+              status: t.is_available === false ? 'habis' : 'tersedia',
+              created_at: t.created_at || new Date().toISOString(),
+            }));
+            localStorage.setItem(STORAGE_KEYS.TOPPINGS, JSON.stringify(sanitized));
+            return sanitized;
           }
         }
       } catch (err) {
@@ -423,10 +478,16 @@ class DatabaseService {
 
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
+        const payload = {
+          name: newTopping.name,
+          price: newTopping.price,
+          is_available: newTopping.status === 'tersedia',
+        };
+
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings`, {
           method: 'POST',
           headers: this.getHeaders(),
-          body: JSON.stringify(newTopping),
+          body: JSON.stringify(payload),
         });
         if (res.ok) {
           const data = await res.json();
@@ -447,7 +508,8 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings?id=eq.${id}`, {
+        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `name=eq.${id}`;
+        await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings?${query}`, {
           method: 'DELETE',
           headers: this.getHeaders(),
         });
@@ -473,8 +535,26 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(data));
-            return data;
+            const sanitized: Order[] = data.map((o: any) => ({
+              id: o.id || `ord-${Date.now()}`,
+              order_number: o.order_number || `MEO-${Date.now().toString().slice(-6)}`,
+              customer_name: o.customer_name || 'Pelanggan',
+              order_type: o.order_type || 'dine_in',
+              table_number: o.table_number || '-',
+              items: o.items || [],
+              subtotal: Number(o.subtotal) || 0,
+              tax_amount: Number(o.tax || o.tax_amount) || 0,
+              service_amount: Number(o.service_amount) || 0,
+              total_amount: Number(o.total_amount) || 0,
+              payment_method: o.payment_method || 'cash',
+              amount_paid: Number(o.amount_paid || o.total_amount) || 0,
+              change_amount: Number(o.change_amount) || 0,
+              cashier_name: o.cashier_name || 'Kasir',
+              status: o.payment_status === 'cancelled' ? 'dibatalkan' : (o.status || 'selesai'),
+              created_at: o.created_at || new Date().toISOString(),
+            }));
+            localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(sanitized));
+            return sanitized;
           }
         }
       } catch (err) {
@@ -508,10 +588,24 @@ class DatabaseService {
 
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
+        const payload = {
+          order_number: newOrder.order_number,
+          customer_name: newOrder.customer_name,
+          table_number: newOrder.table_number || '-',
+          order_type: newOrder.order_type || 'dine_in',
+          cashier_name: newOrder.cashier_name || 'Kasir',
+          subtotal: newOrder.subtotal,
+          tax: newOrder.tax_amount,
+          discount: 0,
+          total_amount: newOrder.total_amount,
+          payment_method: newOrder.payment_method,
+          payment_status: 'paid',
+        };
+
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/orders`, {
           method: 'POST',
           headers: this.getHeaders(),
-          body: JSON.stringify(newOrder),
+          body: JSON.stringify(payload),
         });
         if (res.ok) {
           const data = await res.json();
@@ -532,10 +626,13 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        await fetch(`${this.config.SUPABASE_URL}/rest/v1/orders?id=eq.${id}`, {
+        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `order_number=eq.${id}`;
+        await fetch(`${this.config.SUPABASE_URL}/rest/v1/orders?${query}`, {
           method: 'PATCH',
           headers: this.getHeaders(),
-          body: JSON.stringify({ status }),
+          body: JSON.stringify({
+            payment_status: status === 'dibatalkan' ? 'cancelled' : 'paid',
+          }),
         });
       } catch (err) {
         console.warn('Supabase update order status failed', err);
