@@ -40,8 +40,3 @@
 ```
 
 ---
-
-## 👥 Akun Login (Plain Text Password)
-
-- **Kasir**: username `kasir` / password `kasir123`
-- **Owner**: username `owner` / password `owner123` (Owner: Mega Octa)
