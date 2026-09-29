@@ -3,28 +3,28 @@ import {
   TrendingUp,
   DollarSign,
   ShoppingBag,
-  Users,
   Calendar,
-  CreditCard,
   Banknote,
   QrCode,
-  ArrowUpRight,
-  Filter,
-  CheckCircle2,
-  Clock,
-  XCircle,
-  FileSpreadsheet,
-  Download
+  Download,
+  Search,
+  CalendarDays
 } from 'lucide-react';
 import { Order, MenuItem } from '../types';
 import { db } from '../services/supabase';
-import { formatCurrency, DEFAULT_CONFIG } from '../services/config';
+import { formatCurrency } from '../services/config';
+
+type TimeRangeFilter = 'today' | 'this_week' | 'this_month' | 'this_year' | 'by_year' | 'all';
 
 export const OwnerStatistikPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [menus, setMenus] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'this_month'>('all');
+  
+  // Filter States
+  const [timeRange, setTimeRange] = useState<TimeRangeFilter>('all');
+  const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
+  const [tableSearchQuery, setTableSearchQuery] = useState('');
 
   useEffect(() => {
     async function loadStats() {
@@ -44,23 +44,73 @@ export const OwnerStatistikPage: React.FC = () => {
     loadStats();
   }, []);
 
-  // Filtered Orders
+  // Available Years from data
+  const availableYears = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const yearsSet = new Set<string>([currentYear.toString(), (currentYear - 1).toString(), (currentYear - 2).toString()]);
+    orders.forEach((o) => {
+      if (o.created_at) {
+        const y = new Date(o.created_at).getFullYear().toString();
+        yearsSet.add(y);
+      }
+    });
+    return Array.from(yearsSet).sort((a, b) => Number(b) - Number(a));
+  }, [orders]);
+
+  // Helper date calculation
+  const getStartOfWeek = (d: Date) => {
+    const date = new Date(d);
+    const day = date.getDay();
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const monday = new Date(date.setDate(diff));
+    monday.setHours(0, 0, 0, 0);
+    return monday;
+  };
+
+  // Filtered Orders by Time Range
   const filteredOrders = useMemo(() => {
     const now = new Date();
     const todayStr = now.toISOString().slice(0, 10);
-    const monthStr = now.toISOString().slice(0, 7);
+    const thisMonthStr = now.toISOString().slice(0, 7);
+    const thisYearStr = now.getFullYear().toString();
+    const startOfWeek = getStartOfWeek(now);
 
     return orders.filter((o) => {
-      const orderDate = new Date(o.created_at).toISOString();
-      if (timeFilter === 'today') {
-        return orderDate.startsWith(todayStr);
+      if (!o.created_at) return false;
+      const orderDate = new Date(o.created_at);
+      const orderDateIso = orderDate.toISOString();
+
+      if (timeRange === 'today') {
+        return orderDateIso.startsWith(todayStr);
       }
-      if (timeFilter === 'this_month') {
-        return orderDate.startsWith(monthStr);
+      if (timeRange === 'this_week') {
+        return orderDate >= startOfWeek && orderDate <= now;
       }
-      return true;
+      if (timeRange === 'this_month') {
+        return orderDateIso.startsWith(thisMonthStr);
+      }
+      if (timeRange === 'this_year') {
+        return orderDateIso.startsWith(thisYearStr);
+      }
+      if (timeRange === 'by_year') {
+        return orderDate.getFullYear().toString() === selectedYear;
+      }
+      return true; // 'all'
     });
-  }, [orders, timeFilter]);
+  }, [orders, timeRange, selectedYear]);
+
+  // Search filter for table
+  const tableDisplayOrders = useMemo(() => {
+    if (!tableSearchQuery.trim()) return filteredOrders;
+    const q = tableSearchQuery.toLowerCase().trim();
+    return filteredOrders.filter(
+      (o) =>
+        o.order_number.toLowerCase().includes(q) ||
+        o.customer_name.toLowerCase().includes(q) ||
+        o.cashier_name.toLowerCase().includes(q) ||
+        o.payment_method.toLowerCase().includes(q)
+    );
+  }, [filteredOrders, tableSearchQuery]);
 
   // Key Metrics
   const totalRevenue = useMemo(() => {
@@ -77,7 +127,7 @@ export const OwnerStatistikPage: React.FC = () => {
     return totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
   }, [totalRevenue, totalOrdersCount]);
 
-  // Today specific metric
+  // Metric Today
   const todayRevenue = useMemo(() => {
     const todayStr = new Date().toISOString().slice(0, 10);
     return orders
@@ -120,11 +170,14 @@ export const OwnerStatistikPage: React.FC = () => {
 
   // Export CSV
   const handleExportCSV = () => {
-    if (filteredOrders.length === 0) return;
+    if (tableDisplayOrders.length === 0) {
+      alert('Tidak ada data untuk diexport.');
+      return;
+    }
     const headers = ['No Order', 'Waktu', 'Pelanggan', 'Tipe', 'Total (Rp)', 'Metode Bayar', 'Kasir', 'Status'];
-    const rows = filteredOrders.map((o) => [
+    const rows = tableDisplayOrders.map((o) => [
       o.order_number,
-      new Date(o.created_at).toLocaleString('id-ID'),
+      `"${new Date(o.created_at).toLocaleString('id-ID')}"`,
       `"${o.customer_name}"`,
       o.order_type,
       o.total_amount,
@@ -133,75 +186,119 @@ export const OwnerStatistikPage: React.FC = () => {
       o.status,
     ]);
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `laporan-penjualan-meocafe-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `laporan-transaksi-meocafe-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const getFilterLabel = () => {
+    if (timeRange === 'today') return 'Hari Ini';
+    if (timeRange === 'this_week') return 'Minggu Ini';
+    if (timeRange === 'this_month') return 'Bulan Ini';
+    if (timeRange === 'this_year') return 'Tahun Ini';
+    if (timeRange === 'by_year') return `Tahun ${selectedYear}`;
+    return 'Semua Periode';
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       
-      {/* Top Header & Filters */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Top Header & Time Filter Bar */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100/70 text-blue-700 text-xs font-bold mb-1.5">
-            <TrendingUp className="w-3.5 h-3.5" />
-            <span>Owner Executive Analytics</span>
-          </div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">
             Statistik Penjualan <span className="text-blue-600">Meo Cafe</span>
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
-            Ikhtisar performa omzet, pesanan terlaris, dan arus kas masuk secara realtime.
+            Laporan omzet, pesanan terlaris, dan arus transaksi kasir.
           </p>
         </div>
 
-        {/* Filter Controls & Export */}
-        <div className="flex items-center gap-3">
-          <div className="bg-white p-1 rounded-full border border-slate-200/80 shadow-sm flex items-center gap-1">
-            <button
-              onClick={() => setTimeFilter('all')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                timeFilter === 'all'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+        {/* Filter Toolbar: Hari Ini, Minggu Ini, Bulan Ini, Tahun Ini, Pilih Tahun, Semua */}
+        <div className="flex flex-wrap items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-200/80 shadow-sm">
+          <button
+            onClick={() => setTimeRange('today')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              timeRange === 'today'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            Hari Ini
+          </button>
+          
+          <button
+            onClick={() => setTimeRange('this_week')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              timeRange === 'this_week'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            Minggu Ini
+          </button>
+
+          <button
+            onClick={() => setTimeRange('this_month')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              timeRange === 'this_month'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            Bulan Ini
+          </button>
+
+          <button
+            onClick={() => setTimeRange('this_year')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              timeRange === 'this_year'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            Tahun Ini
+          </button>
+
+          {/* By Specific Year Dropdown Filter */}
+          <div className="flex items-center gap-1 pl-1 border-l border-slate-200">
+            <select
+              value={timeRange === 'by_year' ? selectedYear : ''}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setSelectedYear(e.target.value);
+                  setTimeRange('by_year');
+                }
+              }}
+              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                timeRange === 'by_year'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
             >
-              Semua
-            </button>
-            <button
-              onClick={() => setTimeFilter('today')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                timeFilter === 'today'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Hari Ini
-            </button>
-            <button
-              onClick={() => setTimeFilter('this_month')}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                timeFilter === 'this_month'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Bulan Ini
-            </button>
+              <option value="" disabled>Pilih Tahun</option>
+              {availableYears.map((yr) => (
+                <option key={yr} value={yr} className="text-slate-900 bg-white">
+                  Tahun {yr}
+                </option>
+              ))}
+            </select>
           </div>
 
           <button
-            onClick={handleExportCSV}
-            className="clay-btn clay-btn-secondary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5"
+            onClick={() => setTimeRange('all')}
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              timeRange === 'all'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
           >
-            <Download className="w-3.5 h-3.5" />
-            Export CSV
+            Semua
           </button>
         </div>
       </div>
@@ -209,7 +306,7 @@ export const OwnerStatistikPage: React.FC = () => {
       {/* Bento KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {/* Card 1: Total Omzet */}
+        {/* Card 1: Total Omzet Terfilter */}
         <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-blue-600">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -224,12 +321,12 @@ export const OwnerStatistikPage: React.FC = () => {
               {formatCurrency(totalRevenue)}
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
-              Periode: {timeFilter === 'all' ? 'Keseluruhan' : timeFilter === 'today' ? 'Hari Ini' : 'Bulan Ini'}
+              Periode: {getFilterLabel()}
             </span>
           </div>
         </div>
 
-        {/* Card 2: Hari Ini */}
+        {/* Card 2: Omzet Hari Ini */}
         <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-emerald-500">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -244,7 +341,7 @@ export const OwnerStatistikPage: React.FC = () => {
               {formatCurrency(todayRevenue)}
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
-              Realtime update dari kasir
+              Penjualan realtime kasir
             </span>
           </div>
         </div>
@@ -261,10 +358,10 @@ export const OwnerStatistikPage: React.FC = () => {
           </div>
           <div className="mt-4">
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-              {totalOrdersCount} <span className="text-sm font-normal text-slate-500">struk</span>
+              {totalOrdersCount} <span className="text-sm font-normal text-slate-500">pesanan</span>
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
-              Pesanan selesai diproses
+              Periode: {getFilterLabel()}
             </span>
           </div>
         </div>
@@ -284,26 +381,26 @@ export const OwnerStatistikPage: React.FC = () => {
               {formatCurrency(avgOrderValue)}
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
-              Per basket size pelanggan
+              Nilai belanja per transaksi
             </span>
           </div>
         </div>
       </div>
 
-      {/* Middle Analytics Section (Top Selling 7 Cols | Payment Ratio 5 Cols) */}
+      {/* Middle Analytics Section (Top Selling & Payment Channels) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Top Selling Menus */}
         <div className="lg:col-span-7 clay-card p-6 bg-white space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 className="font-extrabold text-slate-900 text-base font-sans">
-              🏆 Top 5 Menu Paling Laris
+              🏆 Top 5 Menu Terlaris ({getFilterLabel()})
             </h3>
-            <span className="text-xs text-slate-400">Berdasarkan volume terjual</span>
+            <span className="text-xs text-slate-400">Berdasarkan porsi terjual</span>
           </div>
 
           {topSelling.length === 0 ? (
-            <p className="text-center text-slate-400 py-10 text-xs">Belum ada data pesanan</p>
+            <p className="text-center text-slate-400 py-10 text-xs">Belum ada pesanan pada periode ini</p>
           ) : (
             <div className="space-y-3">
               {topSelling.map((it, idx) => (
@@ -335,7 +432,7 @@ export const OwnerStatistikPage: React.FC = () => {
           <div>
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-extrabold text-slate-900 text-base font-sans">
-                💳 Saluran Pembayaran
+                💳 Saluran Pembayaran ({getFilterLabel()})
               </h3>
               <span className="text-xs text-slate-400">Tunai vs Non-Tunai</span>
             </div>
@@ -382,25 +479,52 @@ export const OwnerStatistikPage: React.FC = () => {
           </div>
 
           <div className="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-100 text-xs text-blue-900">
-            💡 <strong>Rekomendasi:</strong> Promosikan pembayaran QRIS untuk mempercepat antrean meja kasir di jam sibuk.
+            Total penerimaan periode ini: <strong>{formatCurrency(totalRevenue)}</strong>
           </div>
         </div>
       </div>
 
-      {/* Transaction Log Table */}
+      {/* Transaction Table with Search & CSV Finder in Right Box */}
       <div className="clay-card p-6 bg-white space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+        
+        {/* Table Header with Search & CSV Button on the RIGHT */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div>
             <h3 className="font-extrabold text-slate-900 text-lg font-sans">
               Daftar Transaksi Kasir
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">Seluruh pesanan masuk secara kronologis</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              Menampilkan {tableDisplayOrders.length} transaksi ({getFilterLabel()})
+            </p>
           </div>
-          <span className="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
-            Total {filteredOrders.length} Transaksi
-          </span>
+
+          {/* Right Box: Search Input & CSV Export Button */}
+          <div className="flex items-center gap-2.5 w-full md:w-auto">
+            {/* Search Input Box */}
+            <div className="relative flex-1 md:w-64">
+              <input
+                type="text"
+                placeholder="Cari order / nama..."
+                value={tableSearchQuery}
+                onChange={(e) => setTableSearchQuery(e.target.value)}
+                className="clay-input pl-9 pr-3 !py-2 text-xs"
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+
+            {/* CSV Export Button */}
+            <button
+              onClick={handleExportCSV}
+              className="clay-btn clay-btn-secondary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5 shrink-0"
+              title="Unduh laporan transaksi dalam format CSV"
+            >
+              <Download className="w-3.5 h-3.5" />
+              Export CSV
+            </button>
+          </div>
         </div>
 
+        {/* Table Content */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
@@ -416,14 +540,14 @@ export const OwnerStatistikPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {filteredOrders.length === 0 ? (
+              {tableDisplayOrders.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-8 text-center text-slate-400">
-                    Tidak ada transaksi dalam filter ini.
+                    Tidak ada data transaksi ditemukan.
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((ord) => (
+                tableDisplayOrders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
                     <td className="py-3.5 px-2 font-bold text-slate-900">{ord.order_number}</td>
                     <td className="py-3.5 px-2 text-slate-500">

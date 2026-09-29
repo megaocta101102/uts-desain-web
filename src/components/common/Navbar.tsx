@@ -18,42 +18,28 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 border-b border-blue-100/80 transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/85 border-b border-blue-100/80 transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
         
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white shadow-[0_6px_16px_rgba(37,99,235,0.3)] transition-transform group-hover:scale-105">
-              <Coffee className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="font-extrabold text-xl tracking-tight text-slate-900 font-sans">
-                Meo <span className="text-blue-600">Cafe</span>
-              </span>
-              {isOwnerArea && (
-                <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-100 text-amber-800 rounded-full border border-amber-200">
-                  Owner Portal
-                </span>
-              )}
-              {isKasirArea && (
-                <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded-full border border-blue-200">
-                  Kasir POS
-                </span>
-              )}
-            </div>
-          </Link>
-        </div>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_6px_16px_rgba(37,99,235,0.25)] transition-transform group-hover:scale-105">
+            <Coffee className="w-5 h-5" />
+          </div>
+          <span className="font-extrabold text-xl tracking-tight text-slate-900 font-sans">
+            Meo <span className="text-blue-600">Cafe</span>
+          </span>
+        </Link>
 
-        {/* Navigation Links depending on area */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1.5 rounded-full border border-slate-200/60 shadow-inner">
+        {/* Navigation Links */}
+        <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-full border border-slate-200/60">
           {isOwnerArea ? (
             <>
               <Link
                 to="/owner/statistik"
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
                   location.pathname === '/owner/statistik'
-                    ? 'bg-white text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.06)]'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -64,7 +50,7 @@ export const Navbar: React.FC = () => {
                 to="/owner/menu"
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
                   location.pathname === '/owner/menu'
-                    ? 'bg-white text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.06)]'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -75,7 +61,7 @@ export const Navbar: React.FC = () => {
                 to="/owner/kasir"
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
                   location.pathname === '/owner/kasir'
-                    ? 'bg-white text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.06)]'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -84,18 +70,16 @@ export const Navbar: React.FC = () => {
               </Link>
             </>
           ) : isKasirArea ? (
-            <>
-              <span className="px-4 py-1.5 text-sm font-medium text-slate-700">
-                Mode Kasir Aktif
-              </span>
-            </>
+            <span className="px-4 py-1.5 text-sm font-medium text-slate-700">
+              Kasir POS
+            </span>
           ) : (
             <>
               <Link
                 to="/"
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                   location.pathname === '/'
-                    ? 'bg-white text-blue-600 shadow-[0_2px_8px_rgba(0,0,0,0.06)]'
+                    ? 'bg-white text-blue-600 shadow-sm'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -164,7 +148,7 @@ export const Navbar: React.FC = () => {
               className="clay-btn clay-btn-secondary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Beranda Pelanggan
+              Beranda
             </Link>
           ) : (
             <Link

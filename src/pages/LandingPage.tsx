@@ -1,20 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Coffee,
   Search,
-  Sparkles,
   MapPin,
   Clock,
-  Phone,
-  ShieldCheck,
   ChevronRight,
-  Heart,
-  Plus,
   ArrowRight,
-  Check,
-  Flame,
-  Award
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping } from '../types';
 import { db } from '../services/supabase';
@@ -57,79 +48,68 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="space-y-16 pb-20">
-      {/* Hero Bento Grid Section */}
+      {/* Hero Bento Section */}
       <section id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Main Hero Card (8 Cols) */}
-          <div className="lg:col-span-8 clay-card p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/30">
-            <div className="relative z-10 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 text-blue-700 text-xs font-bold mb-6 border border-blue-200">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Malang Coffee & Pastry Destination</span>
-              </div>
-              
-              <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.15] font-display">
+          {/* Main Hero Card (7 Cols) */}
+          <div className="lg:col-span-7 clay-card p-8 sm:p-12 flex flex-col justify-between bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20">
+            <div>
+              <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.18] font-display">
                 Harmoni Rasa & Ketenangan di <span className="text-blue-600">Meo Cafe</span>
               </h1>
               
-              <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed">
-                Nikmati sentuhan biji kopi single origin pilihan, seduhan teh botanikal alami, dan pastry Prancis berlapis mentega murni dalam suasana yang tenang dan estetik.
+              <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed max-w-xl">
+                Nikmati sentuhan biji kopi single origin pilihan, seduhan teh botanikal alami, dan pastry Prancis berlapis mentega murni.
               </p>
 
-              <div className="mt-8 flex flex-wrap items-center gap-4">
+              <div className="mt-8 flex items-center">
                 <a
                   href="#menuSection"
                   className="clay-btn clay-btn-primary"
                 >
-                  Jelajahi Menu Spesial
+                  Lihat Daftar Menu
                   <ArrowRight className="w-4 h-4" />
                 </a>
-                <Link
-                  to="/login"
-                  className="clay-btn clay-btn-secondary"
-                >
-                  Portal Kasir / Owner
-                </Link>
               </div>
             </div>
 
-            {/* Quick Feature Stats */}
-            <div className="grid grid-cols-3 gap-4 pt-10 mt-10 border-t border-blue-100/80 relative z-10">
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-4 pt-8 mt-10 border-t border-slate-200/60">
               <div>
-                <span className="block text-2xl sm:text-3xl font-extrabold text-blue-600 font-display">100%</span>
-                <span className="text-xs sm:text-sm text-slate-500 font-medium">Arabika Premium</span>
+                <h4 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">100%</h4>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">Arabika Premium</p>
               </div>
               <div>
-                <span className="block text-2xl sm:text-3xl font-extrabold text-indigo-600 font-display">15+</span>
-                <span className="text-xs sm:text-sm text-slate-500 font-medium">Varian Menu & Topping</span>
+                <h4 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">15+</h4>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">Varian Menu</p>
               </div>
               <div>
-                <span className="block text-2xl sm:text-3xl font-extrabold text-blue-600 font-display">4.9★</span>
-                <span className="text-xs sm:text-sm text-slate-500 font-medium">Kepuasan Pelanggan</span>
+                <h4 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-display">4.9★</h4>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium">Rating Kepuasan</p>
               </div>
             </div>
-
-            {/* Subtle background glow */}
-            <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-blue-200/40 rounded-full blur-3xl pointer-events-none"></div>
           </div>
 
-          {/* Hero Visual Card (4 Cols) */}
-          <div className="lg:col-span-4 clay-card overflow-hidden relative min-h-[320px] lg:min-h-full flex flex-col justify-end p-6 group">
+          {/* Hero Visual Card (5 Cols) with Clean Cafe Name on Photo */}
+          <div className="lg:col-span-5 clay-card overflow-hidden relative min-h-[340px] lg:min-h-full flex flex-col justify-end p-8 group">
             <img
               src="/assets/images/hero_cafe.jpg"
-              alt="Meo Cafe Interior"
+              alt="Meo Cafe"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/30 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent"></div>
             
-            <div className="relative z-10 text-white space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-semibold">
-                <MapPin className="w-3.5 h-3.5 text-blue-300" />
-                <span>Sukun, Kota Malang</span>
-              </div>
-              <p className="text-xs text-slate-200">
-                Tempat ideal untuk bekerja produktif, bercengkerama, atau menikmati sore tenang.
+            {/* Clean Cafe Name Overlay on Photo */}
+            <div className="relative z-10 text-white">
+              <span className="text-xs uppercase tracking-widest text-blue-300 font-bold block mb-1">
+                Kota Malang
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-display text-white">
+                Meo Cafe
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-200 mt-1">
+                Jl. Pelabuhan Tanjuk Priok No.10, Sukun
               </p>
             </div>
           </div>
@@ -138,30 +118,26 @@ export const LandingPage: React.FC = () => {
 
       {/* Menu Catalog Section */}
       <section id="menuSection" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 scroll-mt-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 text-blue-600 font-bold text-xs uppercase tracking-widest mb-2">
-              <Coffee className="w-4 h-4" />
-              <span>Daftar Menu & Kuliner</span>
-            </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-display">
-              Kurasi Menu Meo Cafe
+              Daftar Menu
             </h2>
             <p className="text-slate-500 text-sm mt-1 max-w-md">
-              Pilihan minuman racikan barista berpengalaman dan santapan lezat dengan bahan bermutu tinggi.
+              Pilihan minuman kopi spesial, teh segar, dan sajian kuliner lezat.
             </p>
           </div>
 
-          {/* Search Input */}
+          {/* Search Box */}
           <div className="relative w-full md:w-80">
             <input
               type="text"
-              placeholder="Cari kopi, mocktail, pastry..."
+              placeholder="Cari kopi, pastry, snack..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="clay-input pl-11 pr-4 py-3"
+              className="clay-input pl-11 pr-4 py-2.5 text-sm"
             />
-            <Search className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
 
@@ -169,9 +145,9 @@ export const LandingPage: React.FC = () => {
         <div className="flex items-center gap-2.5 overflow-x-auto pb-4 mb-8 no-scrollbar">
           {[
             { id: 'all', label: 'Semua Menu' },
-            { id: 'minuman', label: '☕ Minuman & Kopi' },
-            { id: 'makanan', label: '🥐 Makanan & Pastry' },
-            { id: 'snack', label: '🍟 Snack & Bites' },
+            { id: 'minuman', label: '☕ Minuman' },
+            { id: 'makanan', label: '🥐 Makanan' },
+            { id: 'snack', label: '🍟 Snack' },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -215,24 +191,24 @@ export const LandingPage: React.FC = () => {
                 className="clay-card overflow-hidden flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-300 bg-white"
               >
                 <div>
-                  {/* Image & Badge */}
+                  {/* Image & Category Tag */}
                   <div className="relative h-48 w-full overflow-hidden bg-slate-100">
                     <img
                       src={item.image_url}
                       alt={item.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/assets/images/coffee_signature.jpg';
                       }}
                     />
                     <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white/90 backdrop-blur-md text-blue-700 shadow-sm border border-white">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-white/90 backdrop-blur-md text-blue-700 shadow-sm">
                         {item.category}
                       </span>
                     </div>
                     {item.status === 'habis' && (
                       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
-                        <span className="px-3 py-1 rounded-full bg-red-600 text-white font-bold text-xs uppercase tracking-wider">
+                        <span className="px-3 py-1 rounded-full bg-red-600 text-white font-bold text-xs uppercase">
                           Habis
                         </span>
                       </div>
@@ -245,7 +221,7 @@ export const LandingPage: React.FC = () => {
                       {item.name}
                     </h3>
                     <p className="text-slate-500 text-xs mt-2 line-clamp-2 leading-relaxed">
-                      {item.description || 'Kelezatan autentik racikan resep rahasia barista Meo Cafe.'}
+                      {item.description || 'Pilihan menu istimewa Meo Cafe.'}
                     </p>
                   </div>
                 </div>
@@ -269,12 +245,13 @@ export const LandingPage: React.FC = () => {
         )}
       </section>
 
-      {/* Cafe Information & Location Bento */}
+      {/* Cafe Information Bento (Clean 2 Columns: Lokasi & Jam) */}
       <section id="infoSection" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
+          {/* Card 1: Lokasi */}
           <div className="clay-card p-6 sm:p-8 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
               <MapPin className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 font-display">Lokasi Kami</h3>
@@ -292,12 +269,13 @@ export const LandingPage: React.FC = () => {
             </a>
           </div>
 
+          {/* Card 2: Jam Operasional */}
           <div className="clay-card p-6 sm:p-8 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
               <Clock className="w-6 h-6" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 font-display">Jam Operasional</h3>
-            <div className="space-y-1 text-sm text-slate-600">
+            <div className="space-y-1.5 text-sm text-slate-600">
               <div className="flex justify-between">
                 <span>Senin - Jumat:</span>
                 <span className="font-semibold text-slate-900">09:00 - 23:00 WIB</span>
@@ -307,23 +285,9 @@ export const LandingPage: React.FC = () => {
                 <span className="font-semibold text-slate-900">08:00 - 00:00 WIB</span>
               </div>
             </div>
-            <p className="text-xs text-emerald-600 font-semibold flex items-center gap-1.5 pt-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              Buka Setiap Hari Termasuk Libur Nasional
+            <p className="text-xs text-slate-500 pt-2">
+              Buka setiap hari untuk dine-in dan takeaway.
             </p>
-          </div>
-
-          <div className="clay-card p-6 sm:p-8 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center shadow-inner">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 font-display">Standar Higienis</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">
-              Semua bahan diproses segar setiap hari dengan standar kebersihan ketat dan barista tersertifikasi.
-            </p>
-            <div className="pt-2 text-xs font-semibold text-slate-500">
-              Owner: {DEFAULT_CONFIG.OWNER_NAME}
-            </div>
           </div>
         </div>
       </section>
@@ -363,7 +327,7 @@ export const LandingPage: React.FC = () => {
               {/* Compatible Toppings */}
               <div className="space-y-2 border-t border-slate-100 pt-4">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Rekomendasi Tambahan Topping
+                  Pilihan Tambahan Topping
                 </h4>
                 <div className="grid grid-cols-2 gap-2">
                   {toppings
@@ -384,20 +348,13 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-3">
+              <div className="pt-2 flex items-center justify-end">
                 <button
                   onClick={() => setSelectedMenu(null)}
-                  className="clay-btn clay-btn-secondary !py-2.5 !px-5 text-sm"
+                  className="clay-btn clay-btn-secondary !py-2.5 !px-6 text-sm"
                 >
                   Tutup
                 </button>
-                <Link
-                  to="/kasir"
-                  className="clay-btn clay-btn-primary !py-2.5 !px-5 text-sm flex items-center gap-2"
-                >
-                  Pesan di Kasir
-                  <ChevronRight className="w-4 h-4" />
-                </Link>
               </div>
             </div>
           </div>
