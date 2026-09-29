@@ -1,0 +1,439 @@
+/* ==============================================================================
+   L'AZUR ARTISAN CAFE - KASIR POS & STRUK CSS (INDEPENDENT)
+   ============================================================================== */
+
+@import url('clay-base.css');
+
+.pos-layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 24px 32px;
+  min-height: calc(100vh - 76px);
+}
+
+/* Left Panel: Menu Discovery & Order Selection */
+.pos-menu-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pos-search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pos-menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.pos-menu-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  position: relative;
+  min-height: 220px;
+  border-radius: var(--radius-md);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pos-menu-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary-blue);
+}
+
+.pos-menu-card.unavailable {
+  opacity: 0.55;
+  filter: grayscale(0.8);
+  cursor: not-allowed;
+}
+
+.pos-card-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 110px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-blue-subtle);
+  margin-bottom: 10px;
+}
+
+.pos-card-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pos-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pos-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+  line-height: 1.3;
+}
+
+.pos-card-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pos-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-light);
+}
+
+.pos-card-price {
+  font-weight: 800;
+  color: var(--primary-blue);
+  font-size: 0.95rem;
+}
+
+.pos-add-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary-blue);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.pos-add-btn:hover {
+  transform: scale(1.1);
+  background: var(--primary-blue-hover);
+}
+
+/* Right Panel: Order Cart ala Gacoan */
+.pos-cart-panel {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 110px);
+  position: sticky;
+  top: 90px;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.cart-header-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--navy-accent);
+}
+
+.cart-order-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.cart-items-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+  margin-bottom: 16px;
+}
+
+.cart-item-row {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  background: var(--bg-surface-soft);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  gap: 8px;
+}
+
+.cart-item-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cart-item-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.cart-item-price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+  white-space: nowrap;
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qty-control-group {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease;
+}
+
+.qty-btn:hover {
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+}
+
+.qty-val {
+  min-width: 28px;
+  text-align: center;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.item-note-input {
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--border-light);
+  color: var(--text-secondary);
+  outline: none;
+  width: 100%;
+}
+
+.item-note-input:focus {
+  border-bottom-color: var(--primary-blue);
+}
+
+/* Cart Calculation Summary */
+.cart-calculation {
+  border-top: 1px solid var(--border-light);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.calc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-secondary);
+}
+
+.calc-row-total {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--navy-accent);
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.calc-row-total span:last-child {
+  color: var(--primary-blue);
+}
+
+.cart-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Payment Modal Specifics */
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.pay-method-card {
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface-soft);
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.825rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+
+.pay-method-card.active {
+  border-color: var(--primary-blue);
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+.quick-cash-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.cash-chip {
+  padding: 6px 12px;
+  font-size: 0.775rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cash-chip:hover {
+  background: var(--primary-blue);
+  color: #FFFFFF;
+}
+
+/* Thermal Struk Print View */
+.receipt-paper {
+  background: #FFFFFF;
+  color: #000000;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  padding: 24px 20px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  border: 1px dashed #CBD5E1;
+  border-radius: 4px;
+}
+
+.receipt-header {
+  text-align: center;
+  border-bottom: 1px dashed #000000;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.receipt-header h3 {
+  font-size: 1.15rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.receipt-items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.receipt-items-table td {
+  padding: 4px 0;
+  vertical-align: top;
+}
+
+.receipt-divider {
+  border-top: 1px dashed #000000;
+  margin: 8px 0;
+}
+
+.receipt-footer {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 0.75rem;
+}
+
+/* Print Stylesheet */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .receipt-paper, .receipt-paper * {
+    visibility: visible;
+  }
+  .receipt-paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0;
+    padding: 10px;
+    border: none;
+  }
+  .modal-overlay {
+    background: transparent;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .pos-layout {
+    grid-template-columns: 1fr;
+  }
+  .pos-cart-panel {
+    position: static;
+    height: auto;
+    max-height: none;
+  }
+}

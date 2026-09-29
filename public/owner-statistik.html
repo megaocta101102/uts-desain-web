@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistik & Penjualan - Meo Cafe Owner</title>
+  <meta name="description" content="Dashboard statistik penjualan dan performa bisnis Meo Cafe.">
+  <link rel="stylesheet" href="css/owner-statistik.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="header-nav">
+    <div class="nav-container">
+      <a href="owner-statistik.html" class="nav-brand">
+        Meo <span>Cafe Owner</span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+          Owner: <strong id="ownerNameDisplay" style="color: var(--navy-accent);">Mega Octa</strong>
+        </div>
+        <button id="logoutBtn" class="clay-btn clay-btn-danger clay-btn-sm">
+          Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Owner Container -->
+  <main class="owner-layout">
+    
+    <!-- Header & Subnav Navigation -->
+    <div class="owner-header-row">
+      <div class="owner-title-group">
+        <h1>Statistik & Performa Bisnis</h1>
+        <p>Pantau omset real-time, grafik tren penjualan harian atau bulanan, dan menu terlaris Meo Cafe.</p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <!-- Subnav 3 Halaman Owner -->
+        <div class="owner-nav-tabs">
+          <a href="owner-statistik.html" class="owner-tab-link active">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Statistik Penjualan
+          </a>
+          <a href="owner-menu.html" class="owner-tab-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+            Manajemen Menu
+          </a>
+          <a href="owner-kasir.html" class="owner-tab-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Manajemen Kasir & Profil
+          </a>
+        </div>
+
+        <button id="exportCsvBtn" class="clay-btn clay-btn-secondary clay-btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Ekspor CSV
+        </button>
+      </div>
+    </div>
+
+    <!-- Optimized Bento Analytics Grid -->
+    <section class="bento-analytics-grid">
+      
+      <!-- Stat 1: Total Omset -->
+      <div class="clay-card bento-stat-card">
+        <div class="bento-stat-header">
+          <div class="stat-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+          </div>
+          <span class="stat-trend-tag">+19.2%</span>
+        </div>
+        <div>
+          <div id="bentoTotalRevenue" class="stat-main-value tabular-nums">Rp 0</div>
+          <p class="stat-label-text">Total Omset Pendapatan</p>
+        </div>
+      </div>
+
+      <!-- Stat 2: Total Pesanan -->
+      <div class="clay-card bento-stat-card">
+        <div class="bento-stat-header">
+          <div class="stat-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+          </div>
+          <span class="stat-trend-tag">+14 pesanan</span>
+        </div>
+        <div>
+          <div id="bentoTotalOrders" class="stat-main-value tabular-nums">0 Pesanan</div>
+          <p class="stat-label-text">Total Transaksi Selesai</p>
+        </div>
+      </div>
+
+      <!-- Stat 3: AOV / Rata-rata Transaksi -->
+      <div class="clay-card bento-stat-card">
+        <div class="bento-stat-header">
+          <div class="stat-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+          </div>
+          <span class="stat-trend-tag" style="color: var(--primary-blue); background: var(--bg-blue-subtle);">Rata-rata</span>
+        </div>
+        <div>
+          <div id="bentoAov" class="stat-main-value tabular-nums">Rp 0</div>
+          <p class="stat-label-text">Rata-rata Nilai per Meja (AOV)</p>
+        </div>
+      </div>
+
+      <!-- Stat 4: Estimasi Margin Laba -->
+      <div class="clay-card bento-stat-card">
+        <div class="bento-stat-header">
+          <div class="stat-icon-wrapper">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+          </div>
+          <span class="stat-trend-tag" style="color: #059669;">~45% Margin</span>
+        </div>
+        <div>
+          <div id="bentoProfit" class="stat-main-value tabular-nums">Rp 0</div>
+          <p class="stat-label-text">Estimasi Laba Kotor</p>
+        </div>
+      </div>
+
+      <!-- Bento Chart: Weekly / Monthly Sales Bar (8 Cols) -->
+      <div class="clay-card bento-chart-card">
+        <div class="chart-header">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-accent);" id="chartTitle">Tren Penjualan Mingguan</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);" id="chartSubtitle">Aktivitas perputaran transaksi harian di Meo Cafe</p>
+          </div>
+          
+          <!-- Period Toggle Filter (Mingguan / Bulanan) -->
+          <div class="segmented-tabs">
+            <button type="button" class="tab-btn period-tab-btn active" data-period="weekly">Mingguan (7 Hari)</button>
+            <button type="button" class="tab-btn period-tab-btn" data-period="monthly">Bulanan (30 Hari)</button>
+          </div>
+        </div>
+
+        <div id="weeklySalesChart" class="chart-bars-container">
+          <!-- Rendered by OwnerStatistikController -->
+        </div>
+      </div>
+
+      <!-- Bento Breakdown: Kategori Penjualan (4 Cols) -->
+      <div class="clay-card bento-category-card">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-accent);">Distribusi Kategori</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Persentase pesanan berdasarkan tipe menu</p>
+
+          <div class="category-dist-list">
+            <div class="category-dist-item">
+              <div class="category-dist-header">
+                <span>Minuman (Coffee & Tea)</span>
+                <span id="catMinumanPercent">50%</span>
+              </div>
+              <div class="category-progress-track">
+                <div id="catMinumanBar" class="category-progress-fill" style="width: 50%; background: #3B82F6;"></div>
+              </div>
+            </div>
+
+            <div class="category-dist-item">
+              <div class="category-dist-header">
+                <span>Makanan (Main Course)</span>
+                <span id="catMakananPercent">30%</span>
+              </div>
+              <div class="category-progress-track">
+                <div id="catMakananBar" class="category-progress-fill" style="width: 30%; background: #1D4ED8;"></div>
+              </div>
+            </div>
+
+            <div class="category-dist-item">
+              <div class="category-dist-header">
+                <span>Snack & Pastry</span>
+                <span id="catSnackPercent">20%</span>
+              </div>
+              <div class="category-progress-track">
+                <div id="catSnackBar" class="category-progress-fill" style="width: 20%; background: #60A5FA;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 20px; border-top: 1px solid var(--border-light); padding-top: 10px;">
+          Minuman kopi & artisan tea merupakan kontributor volume terbesar.
+        </div>
+      </div>
+
+      <!-- Bento Top 5 Selling (5 Cols) -->
+      <div class="clay-card bento-top-selling-card">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-accent);">5 Menu Paling Laris</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Menu dengan frekuensi pesanan tertinggi</p>
+          
+          <div id="topSellingContainer" class="top-items-list">
+            <!-- Rendered by Controller -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bento Recent Transactions Table (7 Cols) -->
+      <div class="clay-card bento-recent-orders-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-accent);">Transaksi Terkini</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Riwayat pesanan yang baru diselesaikan di kasir</p>
+          </div>
+        </div>
+
+        <table class="orders-table-simple">
+          <thead>
+            <tr>
+              <th>No Order</th>
+              <th>Pelanggan</th>
+              <th>Bayar</th>
+              <th>Total</th>
+              <th>Waktu</th>
+            </tr>
+          </thead>
+          <tbody id="recentOrdersTableBody">
+            <!-- Rendered by Controller -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- MVC JavaScript Scripts -->
+  <script src="js/config/env.js"></script>
+  <script src="js/database/supabaseClient.js"></script>
+  <script src="js/models/ReportModel.js"></script>
+  <script src="js/models/UserModel.js"></script>
+  <script src="js/views/MenuView.js"></script>
+  <script src="js/controllers/OwnerStatistikController.js"></script>
+</body>
+</html>

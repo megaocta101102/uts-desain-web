@@ -1,0 +1,201 @@
+/* ==============================================================================
+   MEO CAFE - OWNER MANAJEMEN KASIR & PROFIL CSS (INDEPENDENT)
+   ============================================================================== */
+
+@import url('clay-base.css');
+
+.owner-layout {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Header */
+.owner-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+.owner-title-group h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.owner-title-group p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.owner-nav-tabs {
+  display: inline-flex;
+  background: var(--bg-blue-subtle);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-inset);
+  gap: 6px;
+}
+
+.owner-tab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.owner-tab-link.active {
+  background: #FFFFFF;
+  color: var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+/* 2-Column Section Grid */
+.owner-sections-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 24px;
+}
+
+/* Profile Card */
+.profile-card {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: 18px;
+}
+
+.profile-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+}
+
+/* Cashier Management Section */
+.cashier-management-card {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cashier-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.cashier-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+}
+
+.cashier-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.cashier-table th {
+  background: var(--bg-surface-soft);
+  padding: 14px 18px;
+  font-weight: 700;
+  color: var(--navy-accent);
+  border-bottom: 1px solid var(--border-light);
+  white-space: nowrap;
+}
+
+.cashier-table td {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.cashier-table tr:hover td {
+  background: var(--bg-blue-subtle);
+}
+
+.password-plain-tag {
+  font-family: var(--font-mono);
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue-dark);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.action-icon-btn:hover {
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.action-icon-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+@media (max-width: 1024px) {
+  .owner-sections-grid {
+    grid-template-columns: 1fr;
+  }
+}

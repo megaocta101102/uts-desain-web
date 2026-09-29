@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Staf - Meo Cafe</title>
+  <meta name="description" content="Portal login staf Kasir dan Owner Meo Cafe.">
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+  <div class="login-wrapper">
+    <div class="clay-card login-card-container">
+      <div class="login-header-logo">
+        Meo <span>Cafe</span>
+      </div>
+      <p class="login-subtitle">Portal Staf Kasir & Owner</p>
+
+      <!-- Role Selector Quick Tabs -->
+      <div class="login-role-selector">
+        <button type="button" class="role-tab-btn active" data-role="kasir">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><line x1="6" y1="8" x2="6" y2="8"></line><line x1="10" y1="8" x2="10" y2="8"></line><line x1="14" y1="8" x2="14" y2="8"></line><line x1="18" y1="8" x2="18" y2="8"></line><line x1="6" y1="12" x2="6" y2="12"></line><line x1="10" y1="12" x2="10" y2="12"></line><line x1="14" y1="12" x2="14" y2="12"></line><line x1="18" y1="12" x2="18" y2="12"></line></svg>
+          Kasir
+        </button>
+        <button type="button" class="role-tab-btn" data-role="owner">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Owner
+        </button>
+      </div>
+
+      <!-- Alert Error Message -->
+      <div id="loginError" style="display: none; padding: 10px 14px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-sm); color: var(--danger); font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; text-align: left;">
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label class="form-label" for="usernameInput">Username</label>
+          <div class="input-icon-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <input type="text" id="usernameInput" class="clay-input" value="kasir" placeholder="Masukkan username" required autofocus>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="passwordInput">Kata Sandi</label>
+          <div class="input-icon-wrap">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <input type="password" id="passwordInput" class="clay-input" value="kasir123" placeholder="Masukkan kata sandi" required>
+          </div>
+        </div>
+
+        <button type="submit" class="clay-btn clay-btn-primary" style="margin-top: 8px; width: 100%;">
+          Masuk ke Akun
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+      </form>
+
+      <a href="index.html" class="back-home-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        Kembali ke Halaman Utama
+      </a>
+    </div>
+  </div>
+
+  <!-- MVC JavaScript Scripts -->
+  <script src="js/config/env.js"></script>
+  <script src="js/database/supabaseClient.js"></script>
+  <script src="js/models/UserModel.js"></script>
+  <script src="js/controllers/LoginController.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/login", "destination": "/public/login.html" },
+    { "source": "/kasir", "destination": "/public/kasir.html" },
+    { "source": "/owner-statistik", "destination": "/public/owner-statistik.html" },
+    { "source": "/owner-menu", "destination": "/public/owner-menu.html" },
+    { "source": "/owner-kasir", "destination": "/public/owner-kasir.html" },
+    { "source": "/owner", "destination": "/public/owner-statistik.html" },
+    { "source": "/(.*)", "destination": "/public/$1" }
+  ]
+}

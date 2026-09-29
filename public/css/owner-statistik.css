@@ -1,0 +1,324 @@
+/* ==============================================================================
+   MEO CAFE - OWNER STATISTIK & BENTO ANALYTICS CSS (INDEPENDENT)
+   ============================================================================== */
+
+@import url('clay-base.css');
+
+.owner-layout {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* Owner Header & Subnav */
+.owner-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 8px;
+}
+
+.owner-title-group h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.owner-title-group p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.owner-nav-tabs {
+  display: inline-flex;
+  background: var(--bg-blue-subtle);
+  padding: 5px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-inset);
+  gap: 6px;
+}
+
+.owner-tab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.owner-tab-link.active {
+  background: #FFFFFF;
+  color: var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+
+/* Bento Analytics Grid Layout */
+.bento-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 20px;
+}
+
+/* 4 Quick Stat Cards */
+.bento-stat-card {
+  grid-column: span 3;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 140px;
+}
+
+.bento-stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.stat-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-trend-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--success);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.stat-main-value {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--navy-accent);
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+
+.stat-label-text {
+  font-size: 0.825rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Weekly Chart Bento Card (8 Cols) */
+.bento-chart-card {
+  grid-column: span 8;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.chart-bars-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  padding-top: 24px;
+  gap: 14px;
+}
+
+.chart-bar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.bar-pill {
+  width: 100%;
+  max-width: 42px;
+  background: linear-gradient(180deg, #3B82F6 0%, #1D4ED8 100%);
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+  transition: height 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bar-amount {
+  font-size: 0.725rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.bar-label {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Category Distribution Bento Card (4 Cols) */
+.bento-category-card {
+  grid-column: span 4;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.category-dist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.category-dist-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.category-dist-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.category-progress-track {
+  height: 8px;
+  background: var(--bg-blue-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.category-progress-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+}
+
+/* Top 5 Products Bento Card (5 Cols) */
+.bento-top-selling-card {
+  grid-column: span 5;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.top-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.top-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-surface-soft);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+}
+
+.top-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-rank-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-item-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+}
+
+.top-item-sold {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.top-item-rev {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--primary-blue);
+}
+
+/* Recent Transactions Bento Card (7 Cols) */
+.bento-recent-orders-card {
+  grid-column: span 7;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.orders-table-simple {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.825rem;
+  margin-top: 12px;
+}
+
+.orders-table-simple th {
+  text-align: left;
+  padding: 8px 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.orders-table-simple td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1024px) {
+  .bento-stat-card { grid-column: span 6; }
+  .bento-chart-card, .bento-category-card, .bento-top-selling-card, .bento-recent-orders-card {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 640px) {
+  .bento-stat-card { grid-column: span 12; }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Meo Cafe & Kasir",
+  "description": "Website menu cafe mewah & estetik Meo Cafe Malang dengan arsitektur MVC Vanilla JS, tema Claymorphism & Minimalist Biru-Putih, integrasi Supabase, fitur Kasir & Struk, serta Dashboard Owner & CRUD Menu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Menu & Topping - Meo Cafe Owner</title>
+  <meta name="description" content="Manajemen CRUD daftar menu dan topping minuman Meo Cafe.">
+  <link rel="stylesheet" href="css/owner-menu.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="header-nav">
+    <div class="nav-container">
+      <a href="owner-menu.html" class="nav-brand">
+        Meo <span>Cafe Owner</span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+          Owner: <strong id="ownerNameDisplay" style="color: var(--navy-accent);">Mega Octa</strong>
+        </div>
+        <button id="logoutBtn" class="clay-btn clay-btn-danger clay-btn-sm">
+          Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="owner-layout">
+    
+    <!-- Header & Subnav Navigation -->
+    <div class="owner-header-row">
+      <div class="owner-title-group">
+        <h1>Manajemen Menu & Topping</h1>
+        <p>Kelola daftar menu makanan, minuman, snack, serta topping tambahan (add-on) Meo Cafe.</p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <!-- Subnav 3 Halaman Owner -->
+        <div class="owner-nav-tabs">
+          <a href="owner-statistik.html" class="owner-tab-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Statistik Penjualan
+          </a>
+          <a href="owner-menu.html" class="owner-tab-link active">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+            Manajemen Menu & Topping
+          </a>
+          <a href="owner-kasir.html" class="owner-tab-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Manajemen Kasir & Profil
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Switcher Tab: Menu vs Topping -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 4px;">
+      <div class="segmented-tabs">
+        <button type="button" class="tab-btn main-view-tab active" data-tab="menus">
+          🍱 Daftar Menu Cafe
+        </button>
+        <button type="button" class="tab-btn main-view-tab" data-tab="toppings">
+          🧋 Topping & Add-on Minuman
+        </button>
+      </div>
+
+      <div id="tabActionContainer">
+        <button id="addMenuBtn" class="clay-btn clay-btn-primary clay-btn-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Tambah Menu Baru
+        </button>
+        <button id="addToppingBtn" class="clay-btn clay-btn-primary clay-btn-sm" style="display: none;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Tambah Topping Baru
+        </button>
+      </div>
+    </div>
+
+    <!-- SECTION 1: MANAJEMEN MENU -->
+    <section id="menuSectionView" style="display: flex; flex-direction: column; gap: 20px;">
+      <!-- Controls Filter Bar -->
+      <div class="clay-card menu-control-bar">
+        <div class="menu-filter-group">
+          <select id="ownerTypeFilter" class="clay-input clay-select" style="width: auto; min-width: 160px;">
+            <option value="all">Semua Tipe Menu</option>
+            <option value="minuman">Minuman</option>
+            <option value="makanan">Makanan</option>
+            <option value="snack">Snack & Pastry</option>
+          </select>
+        </div>
+
+        <!-- Search Box with Find Icon on the RIGHT inside the box -->
+        <div class="search-box" style="min-width: 280px;">
+          <input type="text" id="ownerSearchInput" class="clay-input" placeholder="Cari nama menu...">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+      </div>
+
+      <!-- Menus Table -->
+      <div class="owner-table-wrapper">
+        <table class="clay-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">Foto</th>
+              <th>Nama Menu & Deskripsi</th>
+              <th>Tipe</th>
+              <th>Kategori</th>
+              <th>Harga</th>
+              <th>Status Ketersediaan</th>
+              <th style="width: 110px; text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="ownerMenuTableBody">
+            <!-- Rendered by AnalyticsView -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Table -->
+      <div id="ownerPagination" class="pagination-container">
+        <!-- Rendered by MenuView -->
+      </div>
+    </section>
+
+    <!-- SECTION 2: MANAJEMEN TOPPING & ADD-ON -->
+    <section id="toppingSectionView" style="display: none; flex-direction: column; gap: 20px;">
+      <div class="clay-card" style="padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <h2 style="font-size: 1.2rem; font-weight: 700; color: var(--navy-accent);">Daftar Topping & Add-on Minuman</h2>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">Topping ini akan otomatis muncul pada dropdown pilihan kasir saat kustomisasi minuman.</p>
+        </div>
+      </div>
+
+      <div class="owner-table-wrapper">
+        <table class="clay-table">
+          <thead>
+            <tr>
+              <th>Nama Topping / Add-on</th>
+              <th>Harga Tambahan</th>
+              <th>Status Ketersediaan</th>
+              <th style="width: 110px; text-align: center;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="toppingTableBody">
+            <!-- Rendered by OwnerMenuController -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal CRUD Menu Form -->
+  <div id="menuModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 id="menuModalTitle" style="font-family: var(--font-display); font-size: 1.4rem; color: var(--navy-accent);">Tambah Menu Baru</h3>
+        <button id="closeMenuModal" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="menuForm" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Nama Menu</label>
+          <input type="text" id="menuNameInput" class="clay-input" placeholder="Misal: Meo Velvet Blue Latte" required>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Harga (Rp)</label>
+            <input type="number" id="menuPriceInput" class="clay-input" placeholder="42000" min="0" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tipe Menu</label>
+            <select id="menuTypeSelect" class="clay-input clay-select" required>
+              <option value="minuman">Minuman</option>
+              <option value="makanan">Makanan</option>
+              <option value="snack">Snack & Pastry</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Kategori</label>
+          <input type="text" id="menuCategoryInput" class="clay-input" placeholder="Misal: Specialty Coffee, Main Course..." required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Deskripsi Menu</label>
+          <textarea id="menuDescInput" class="clay-input" rows="3" placeholder="Jelaskan cita rasa, bahan baku, dan keunikan menu Meo Cafe..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">URL Gambar Menu / Preset</label>
+          <input type="text" id="menuImageUrlInput" class="clay-input" placeholder="assets/images/coffee_signature.jpg">
+          
+          <div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
+            <button type="button" class="clay-btn clay-btn-ghost clay-btn-sm img-preset-btn" data-url="assets/images/coffee_signature.jpg" style="font-size: 0.725rem; border: 1px solid var(--border-light);">Preset Kopi</button>
+            <button type="button" class="clay-btn clay-btn-ghost clay-btn-sm img-preset-btn" data-url="assets/images/mocktail_ocean.jpg" style="font-size: 0.725rem; border: 1px solid var(--border-light);">Preset Mocktail</button>
+            <button type="button" class="clay-btn clay-btn-ghost clay-btn-sm img-preset-btn" data-url="assets/images/dessert_pastry.jpg" style="font-size: 0.725rem; border: 1px solid var(--border-light);">Preset Pastry</button>
+            <button type="button" class="clay-btn clay-btn-ghost clay-btn-sm img-preset-btn" data-url="assets/images/hero_cafe.jpg" style="font-size: 0.725rem; border: 1px solid var(--border-light);">Preset Main Dish</button>
+          </div>
+
+          <div class="image-preview-box">
+            <img id="formImagePreview" src="assets/images/coffee_signature.jpg" alt="Preview Gambar" onerror="this.src='assets/images/coffee_signature.jpg'">
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; padding: 10px 0;">
+          <input type="checkbox" id="menuAvailableInput" checked style="width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer;">
+          <label for="menuAvailableInput" style="font-size: 0.85rem; font-weight: 600; color: var(--navy-accent); cursor: pointer;">
+            Menu Tersedia untuk Dipesan (Aktif)
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+          <button type="button" class="clay-btn clay-btn-secondary" onclick="document.getElementById('menuModal').classList.remove('active')">
+            Batal
+          </button>
+          <button type="submit" class="clay-btn clay-btn-primary">
+            Simpan Menu
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal CRUD Topping Form -->
+  <div id="toppingModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 440px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 id="toppingModalTitle" style="font-family: var(--font-display); font-size: 1.35rem; color: var(--navy-accent);">Tambah Topping Baru</h3>
+        <button id="closeToppingModal" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="toppingForm" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label class="form-label">Nama Topping / Add-on</label>
+          <input type="text" id="toppingNameInput" class="clay-input" placeholder="Misal: Extra Espresso Shot, Boba..." required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Harga Tambahan (Rp)</label>
+          <input type="number" id="toppingPriceInput" class="clay-input" placeholder="6000" min="0" required>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; padding: 6px 0;">
+          <input type="checkbox" id="toppingAvailableInput" checked style="width: 18px; height: 18px; accent-color: var(--primary-blue); cursor: pointer;">
+          <label for="toppingAvailableInput" style="font-size: 0.85rem; font-weight: 600; color: var(--navy-accent); cursor: pointer;">
+            Topping Tersedia (Aktif)
+          </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px;">
+          <button type="button" class="clay-btn clay-btn-secondary" onclick="document.getElementById('toppingModal').classList.remove('active')">
+            Batal
+          </button>
+          <button type="submit" class="clay-btn clay-btn-primary">
+            Simpan Topping
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MVC JavaScript Scripts -->
+  <script src="js/config/env.js"></script>
+  <script src="js/database/supabaseClient.js"></script>
+  <script src="js/models/MenuModel.js"></script>
+  <script src="js/models/ToppingModel.js"></script>
+  <script src="js/models/UserModel.js"></script>
+  <script src="js/views/MenuView.js"></script>
+  <script src="js/views/AnalyticsView.js"></script>
+  <script src="js/controllers/OwnerMenuController.js"></script>
+</body>
+</html>

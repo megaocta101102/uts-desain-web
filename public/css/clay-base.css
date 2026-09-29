@@ -1,0 +1,427 @@
+/* ==============================================================================
+   MEO CAFE - CLAYMORPHISM & MINIMALIST BLUE-WHITE DESIGN SYSTEM
+   ============================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  /* Color Palette: Blue & Pure White */
+  --bg-main: #F0F5FC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-soft: #F8FAFD;
+  --bg-blue-subtle: #E8F1FC;
+  --bg-blue-light: #D5E6FA;
+  
+  --primary-blue: #2563EB;
+  --primary-blue-hover: #1D4ED8;
+  --primary-blue-dark: #1E40AF;
+  --navy-accent: #0F254A;
+  
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --text-blue: #1D4ED8;
+  
+  --border-light: rgba(203, 219, 245, 0.7);
+  --border-focus: #3B82F6;
+  
+  --success: #10B981;
+  --danger: #EF4444;
+  --warning: #F59E0B;
+
+  /* Claymorphism Shadows & Insets */
+  --clay-shadow-sm: 
+    6px 8px 16px rgba(37, 99, 235, 0.06), 
+    -4px -4px 12px rgba(255, 255, 255, 0.95),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.9),
+    inset -1px -1px 2px rgba(37, 99, 235, 0.03);
+
+  --clay-shadow-md: 
+    10px 14px 24px rgba(37, 99, 235, 0.08), 
+    -6px -6px 18px rgba(255, 255, 255, 0.95),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.85),
+    inset -2px -2px 4px rgba(37, 99, 235, 0.04);
+
+  --clay-shadow-lg: 
+    16px 22px 36px rgba(37, 99, 235, 0.1), 
+    -8px -8px 24px rgba(255, 255, 255, 0.95),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.9),
+    inset -3px -3px 6px rgba(37, 99, 235, 0.05);
+
+  --clay-shadow-primary: 
+    0 10px 22px rgba(37, 99, 235, 0.3),
+    inset 2px 2px 4px rgba(255, 255, 255, 0.35),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.15);
+
+  --clay-shadow-inset: 
+    inset 3px 3px 7px rgba(37, 99, 235, 0.09), 
+    inset -3px -3px 7px rgba(255, 255, 255, 0.95);
+
+  /* Radius System */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+  
+  /* Typography */
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Reset & Global */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(circle at 10% 10%, rgba(219, 234, 254, 0.5) 0%, transparent 40%),
+    radial-gradient(circle at 90% 90%, rgba(224, 242, 254, 0.6) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Base Clay Classes */
+.clay-card {
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--clay-shadow-md);
+  border: 1px solid var(--border-light);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clay-card-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--clay-shadow-lg);
+}
+
+.clay-card-subtle {
+  background: var(--bg-surface-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+/* Clay Inputs */
+.clay-input {
+  width: 100%;
+  padding: 12px 18px;
+  font-family: var(--font-sans);
+  font-size: 0.925rem;
+  color: var(--text-primary);
+  background: var(--bg-surface-soft);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-inset);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clay-input:focus {
+  border-color: var(--border-focus);
+  background: #FFFFFF;
+  box-shadow: 
+    inset 2px 2px 5px rgba(37, 99, 235, 0.12),
+    0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.clay-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 38px;
+}
+
+/* Search Box with SVG inside on the RIGHT */
+.search-box {
+  position: relative;
+  min-width: 280px;
+}
+
+.search-box input {
+  padding-left: 16px;
+  padding-right: 44px;
+}
+
+.search-box svg {
+  position: absolute;
+  right: 14px;
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+/* Clay Buttons */
+.clay-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.clay-btn:active {
+  transform: scale(0.97);
+}
+
+.clay-btn-primary {
+  background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+  color: #FFFFFF;
+  box-shadow: var(--clay-shadow-primary);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.clay-btn-primary:hover {
+  background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.38);
+}
+
+.clay-btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--clay-shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.clay-btn-secondary:hover {
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  transform: translateY(-2px);
+}
+
+.clay-btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.clay-btn-ghost:hover {
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+}
+
+.clay-btn-danger {
+  background: linear-gradient(135deg, #F87171 0%, #DC2626 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 18px rgba(220, 38, 38, 0.25);
+}
+
+.clay-btn-danger:hover {
+  background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%);
+  transform: translateY(-2px);
+}
+
+.clay-btn-sm {
+  padding: 7px 14px;
+  font-size: 0.825rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Nav Header Container */
+.header-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(240, 245, 252, 0.85);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.nav-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--navy-accent);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+
+.nav-brand span {
+  color: var(--primary-blue);
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  list-style: none;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.925rem;
+  transition: color 0.15s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--primary-blue);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Segmented Control / Tabs */
+.segmented-tabs {
+  display: inline-flex;
+  padding: 5px;
+  background: var(--bg-blue-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--clay-shadow-inset);
+  gap: 4px;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tab-btn.active {
+  background: #FFFFFF;
+  color: var(--primary-blue);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+
+/* Pagination Controls */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 36px;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  box-shadow: var(--clay-shadow-sm);
+  transition: all 0.15s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: var(--bg-blue-subtle);
+  color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+.page-btn.active {
+  background: var(--primary-blue);
+  color: #FFFFFF;
+  border-color: var(--primary-blue);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Modal System */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 37, 74, 0.45);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: var(--bg-surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--clay-shadow-lg);
+  border: 1px solid var(--border-light);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  transform: scale(0.95);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active .modal-content {
+  transform: scale(1);
+}
+
+/* Utility Helpers */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-sans);
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+@media (max-width: 768px) {
+  .nav-menu {
+    display: none;
+  }
+}
