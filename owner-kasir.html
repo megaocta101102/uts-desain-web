@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manajemen Kasir & Profil - Meo Cafe Owner</title>
+  <meta name="description" content="Manajemen akun kasir dan pengaturan profil owner Meo Cafe.">
+  <link rel="stylesheet" href="css/owner-kasir.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="header-nav">
+    <div class="nav-container">
+      <a href="owner-kasir.html" class="nav-brand">
+        Meo <span>Cafe Owner</span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 0.85rem; color: var(--text-secondary);">
+          Owner: <strong id="ownerNameDisplay" style="color: var(--navy-accent);">Mega Octa</strong>
+        </div>
+        <button id="logoutBtn" class="clay-btn clay-btn-danger clay-btn-sm">
+          Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="owner-layout">
+    
+    <!-- Header & Subnav Navigation -->
+    <div class="owner-header-row">
+      <div class="owner-title-group">
+        <h1>Manajemen Kasir & Profil Owner</h1>
+        <p>Atur akun kasir cafe dan perbarui informasi profil & password owner.</p>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <!-- Subnav 3 Halaman Owner -->
+        <div class="owner-nav-tabs">
+          <a href="owner-statistik.html" class="owner-tab-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Statistik Penjualan
+          </a>
+          <a href="owner-menu.html" class="owner-tab-link">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>
+            Manajemen Menu
+          </a>
+          <a href="owner-kasir.html" class="owner-tab-link active">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            Manajemen Kasir & Profil
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2-Column Layout: Left (Profile Owner) & Right (Cashier CRUD) -->
+    <div class="owner-sections-grid">
+      
+      <!-- Left Column: Setting Profil Owner -->
+      <section class="clay-card profile-card">
+        <div class="profile-avatar-row">
+          <div class="profile-avatar" id="ownerAvatarLetter">
+            MO
+          </div>
+          <div>
+            <h2 id="ownerCardName" style="font-size: 1.15rem; font-weight: 700; color: var(--navy-accent);">Mega Octa</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Owner / Super Administrator</p>
+          </div>
+        </div>
+
+        <form id="ownerProfileForm" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap Owner</label>
+            <input type="text" id="ownerFullNameInput" class="clay-input" value="Mega Octa" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Username Owner</label>
+            <input type="text" id="ownerUsernameInput" class="clay-input" value="owner" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password (Plain Text)</label>
+            <input type="text" id="ownerPasswordInput" class="clay-input" value="owner123" required>
+          </div>
+
+          <button type="submit" id="saveOwnerProfileBtn" class="clay-btn clay-btn-primary" style="margin-top: 6px;">
+            Simpan Perubahan Profil
+          </button>
+        </form>
+
+        <div style="font-size: 0.775rem; color: var(--text-muted); background: var(--bg-surface-soft); padding: 12px; border-radius: var(--radius-sm); border: 1px dashed var(--border-light);">
+          🔒 Password disimpan dalam format plain text sesuai permintaan Anda.
+        </div>
+      </section>
+
+      <!-- Right Column: Manajemen Akun Kasir (CRUD) -->
+      <section class="clay-card cashier-management-card">
+        <div class="cashier-card-header">
+          <div>
+            <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--navy-accent);">Daftar Akun Kasir</h2>
+            <p style="font-size: 0.85rem; color: var(--text-secondary);">Kelola hak akses kasir untuk input pesanan di meja kasir cafe.</p>
+          </div>
+
+          <button id="addCashierBtn" class="clay-btn clay-btn-primary clay-btn-sm">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Tambah Kasir Baru
+          </button>
+        </div>
+
+        <!-- Table List Cashiers -->
+        <div class="cashier-table-wrap">
+          <table class="cashier-table">
+            <thead>
+              <tr>
+                <th>Nama Kasir</th>
+                <th>Username</th>
+                <th>Password (Plain Text)</th>
+                <th>Tanggal Dibuat</th>
+                <th style="width: 90px; text-align: center;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="cashierTableBody">
+              <!-- Rendered by OwnerKasirController -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Modal CRUD Kasir -->
+  <div id="cashierModal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 440px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 id="cashierModalTitle" style="font-family: var(--font-display); font-size: 1.35rem; color: var(--navy-accent);">Tambah Akun Kasir</h3>
+        <button id="closeCashierModal" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <form id="cashierForm" style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group">
+          <label class="form-label">Nama Lengkap Kasir</label>
+          <input type="text" id="cashierFullNameInput" class="clay-input" placeholder="Misal: Cindy Permata" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Username Login</label>
+          <input type="text" id="cashierUsernameInput" class="clay-input" placeholder="Misal: cindy" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password Login (Plain Text)</label>
+          <input type="text" id="cashierPasswordInput" class="clay-input" placeholder="Misal: cindy123" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+          <button type="button" class="clay-btn clay-btn-secondary" onclick="document.getElementById('cashierModal').classList.remove('active')">
+            Batal
+          </button>
+          <button type="submit" class="clay-btn clay-btn-primary">
+            Simpan Akun
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MVC JavaScript Scripts -->
+  <script src="js/config/env.js"></script>
+  <script src="js/database/supabaseClient.js"></script>
+  <script src="js/models/UserModel.js"></script>
+  <script src="js/controllers/OwnerKasirController.js"></script>
+</body>
+</html>

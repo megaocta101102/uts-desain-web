@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meo Cafe</title>
+  <meta name="description" content="Website profil dan daftar menu Meo Cafe Malang dengan kurasi kopi spesial, teh artisan, dan kuliner eksklusif.">
+  <!-- Independent CSS -->
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="header-nav">
+    <div class="nav-container">
+      <!-- Zone 1: Brand -->
+      <a href="index.html" class="nav-brand">
+        Meo <span>Cafe</span>
+      </a>
+
+      <!-- Zone 2: Navigation Links -->
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="#hero" class="nav-link active">Beranda</a></li>
+          <li><a href="#menuSection" class="nav-link">Daftar Menu</a></li>
+          <li><a href="#info" class="nav-link">Lokasi & Jam</a></li>
+        </ul>
+      </nav>
+
+      <!-- Zone 3: Primary Action -->
+      <div class="nav-actions">
+        <a href="login.html" class="clay-btn clay-btn-primary clay-btn-sm">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+          Login Staf
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section (Bento Grid) -->
+  <main>
+    <section id="hero" class="hero-section">
+      <div class="hero-bento">
+        <!-- Hero Main Bento Card -->
+        <div class="clay-card hero-main-card">
+          <div>
+            <h1 class="hero-title text-balance">Harmoni Rasa & Ketenangan di Meo Cafe</h1>
+            <p class="hero-description">
+              Nikmati sentuhan biji kopi single origin pilihan, seduhan teh botanikal alami, dan pastry Prancis berlapis mentega murni.
+            </p>
+            <div class="hero-actions">
+              <a href="#menuSection" class="clay-btn clay-btn-primary">
+                Lihat Daftar Menu
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <h4>100%</h4>
+              <p>Arabica Specialty</p>
+            </div>
+            <div class="hero-stat-item">
+              <h4>4.9 ★</h4>
+              <p>Rating Pengunjung</p>
+            </div>
+            <div class="hero-stat-item">
+              <h4>Fresh</h4>
+              <p>Baked Daily</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Visual Bento Card -->
+        <div class="clay-card hero-visual-card">
+          <img src="assets/images/hero_cafe.jpg" alt="Meo Cafe" onerror="this.src='assets/images/coffee_signature.jpg'">
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Catalog Section -->
+    <section id="menuSection" class="menu-catalog-section">
+      <div class="section-header">
+        <div>
+          <p class="section-kicker">Koleksi Rasa</p>
+          <h2 class="section-title">Daftar Menu Pilihan</h2>
+        </div>
+      </div>
+
+      <!-- Filter, Search & Tab Controls -->
+      <div class="catalog-filter-bar">
+        <div class="filter-left-group">
+          <!-- Type Tabs -->
+          <div class="segmented-tabs">
+            <button class="tab-btn tab-type-btn active" data-type="all">Semua Menu</button>
+            <button class="tab-btn tab-type-btn" data-type="minuman">Minuman</button>
+            <button class="tab-btn tab-type-btn" data-type="makanan">Makanan</button>
+            <button class="tab-btn tab-type-btn" data-type="snack">Snack & Pastry</button>
+          </div>
+
+          <!-- Category Select -->
+          <select id="categoryFilter" class="clay-input clay-select" style="width: auto; min-width: 180px;">
+            <option value="all">Semua Kategori</option>
+          </select>
+        </div>
+
+        <!-- Search Box with Find SVG on the RIGHT inside the box -->
+        <div class="search-box">
+          <input type="text" id="searchInput" class="clay-input" placeholder="Cari menu...">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+      </div>
+
+      <!-- Menu Dynamic Grid -->
+      <div id="menuGrid" class="menu-grid">
+        <!-- Rendered by LandingController via MenuView -->
+      </div>
+
+      <!-- Pagination -->
+      <div id="paginationContainer" class="pagination-container">
+        <!-- Rendered by MenuView -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Detail Menu -->
+  <div id="menuDetailModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+        <span id="modalMenuCategory" style="font-size: 0.8rem; font-weight: 700; color: var(--primary-blue); text-transform: uppercase;">Specialty</span>
+        <button id="closeModalBtn" style="background: none; border: none; cursor: pointer; color: var(--text-muted);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <div style="height: 220px; border-radius: var(--radius-md); overflow: hidden; margin-bottom: 18px; background: var(--bg-blue-subtle);">
+        <img id="modalMenuImg" src="" alt="Menu" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+
+      <h3 id="modalMenuName" style="font-family: var(--font-display); font-size: 1.6rem; color: var(--navy-accent); margin-bottom: 6px;"></h3>
+      <p id="modalMenuPrice" class="tabular-nums" style="font-size: 1.3rem; font-weight: 800; color: var(--primary-blue); margin-bottom: 14px;"></p>
+      <p id="modalMenuDesc" style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 24px;"></p>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 16px;">
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Tipe: <strong id="modalMenuType" style="text-transform: capitalize; color: var(--navy-accent);"></strong></span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Status: <strong id="modalMenuStatus"></strong></span>
+      </div>
+
+      <div style="margin-top: 20px; text-align: center; background: var(--bg-surface-soft); padding: 12px; border-radius: var(--radius-sm); font-size: 0.825rem; color: var(--text-secondary);">
+        💡 Pemesanan langsung dilayani oleh kasir di meja kasir cafe.
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Section dengan Tombol Google Maps Proporsional -->
+  <footer id="info" class="footer-section">
+    <div class="footer-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start;">
+      <div>
+        <h3 class="footer-brand-title">Meo Cafe</h3>
+        <p class="footer-brand-desc" style="margin-bottom: 16px;">
+          Ruang kontemplasi rasa dengan standar kopi artisan dan kuliner berkelas. Nikmati momen santai dalam suasana nyaman dan estetik.
+        </p>
+      </div>
+
+      <div>
+        <h4 class="footer-heading">Alamat & Jam Operasional</h4>
+        <ul class="footer-list" style="margin-bottom: 16px;">
+          <li style="display: flex; align-items: flex-start; gap: 8px;">
+            <svg style="margin-top: 3px; color: var(--primary-blue); shrink-0;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            <span><strong>Alamat:</strong> Jl. Pelabuhan Tanjuk Priok No.10, Bakalan Krajan, Sukun, Malang</span>
+          </li>
+          <li style="display: flex; align-items: center; gap: 8px;">
+            <svg style="color: var(--primary-blue); shrink-0;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <span><strong>Senin - Jumat:</strong> 08:00 - 22:00 WIB</span>
+          </li>
+          <li style="display: flex; align-items: center; gap: 8px;">
+            <svg style="color: var(--primary-blue); shrink-0;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <span><strong>Sabtu - Minggu:</strong> 07:00 - 23:00 WIB</span>
+          </li>
+        </ul>
+
+        <!-- Tombol Google Maps Proporsional -->
+        <a 
+          href="https://maps.app.goo.gl/834Rms4rBLfc3tZu7" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          class="clay-btn clay-btn-primary clay-btn-sm" 
+          style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none;"
+          title="Buka lokasi Meo Cafe di Google Maps"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          Petunjuk Arah Google Maps
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2026 Meo Cafe. All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- MVC JavaScript Scripts -->
+  <script src="js/config/env.js"></script>
+  <script src="js/database/supabaseClient.js"></script>
+  <script src="js/models/MenuModel.js"></script>
+  <script src="js/views/MenuView.js"></script>
+  <script src="js/controllers/LandingController.js"></script>
+</body>
+</html>
