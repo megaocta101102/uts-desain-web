@@ -76,7 +76,7 @@ export const LandingPage: React.FC = () => {
             <div>
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-semibold mb-6">
                 <Coffee className="w-3.5 h-3.5" />
-                <span>Specialty Coffee & Artisan Pastry</span>
+                <span>Specialty Coffee & Eatery</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] font-display">

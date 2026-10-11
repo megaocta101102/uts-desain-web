@@ -9,7 +9,9 @@ import { LazyFallback } from './components/common/LazyFallback';
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const KasirPOSPage = lazy(() => import('./pages/KasirPOSPage'));
+const KasirRiwayatPage = lazy(() => import('./pages/KasirRiwayatPage'));
 const OwnerStatistikPage = lazy(() => import('./pages/OwnerStatistikPage'));
+const OwnerTransaksiPage = lazy(() => import('./pages/OwnerTransaksiPage'));
 const OwnerMenuPage = lazy(() => import('./pages/OwnerMenuPage'));
 const OwnerKasirPage = lazy(() => import('./pages/OwnerKasirPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
@@ -33,7 +35,7 @@ const ProtectedKasirRoute: React.FC<{ children: React.ReactNode }> = ({ children
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <LazyFallback message="Memverifikasi Sesi POS Kasir..." />;
+    return <LazyFallback message="Memverifikasi Sesi Kasir POS..." />;
   }
 
   if (!user) {
@@ -44,9 +46,12 @@ const ProtectedKasirRoute: React.FC<{ children: React.ReactNode }> = ({ children
 };
 
 const AppContent: React.FC = () => {
+  const location = useLocation();
+  const isLoginPage = location.pathname === '/login' || location.pathname === '/login.html';
+
   return (
     <div className="min-h-screen flex flex-col justify-between">
-      <Navbar />
+      {!isLoginPage && <Navbar />}
       <main className="flex-1">
         <Suspense fallback={<LazyFallback />}>
           <Routes>
@@ -69,6 +74,17 @@ const AppContent: React.FC = () => {
             />
             <Route path="/kasir.html" element={<Navigate to="/kasir" replace />} />
 
+            {/* Riwayat Transaksi Kasir (Dedicated Full Page) */}
+            <Route
+              path="/kasir/riwayat"
+              element={
+                <ProtectedKasirRoute>
+                  <KasirRiwayatPage />
+                </ProtectedKasirRoute>
+              }
+            />
+            <Route path="/kasir-riwayat.html" element={<Navigate to="/kasir/riwayat" replace />} />
+
             {/* Owner Portal */}
             <Route path="/owner" element={<Navigate to="/owner/statistik" replace />} />
             <Route path="/owner.html" element={<Navigate to="/owner/statistik" replace />} />
@@ -82,6 +98,16 @@ const AppContent: React.FC = () => {
               }
             />
             <Route path="/owner-statistik.html" element={<Navigate to="/owner/statistik" replace />} />
+
+            <Route
+              path="/owner/transaksi"
+              element={
+                <ProtectedOwnerRoute>
+                  <OwnerTransaksiPage />
+                </ProtectedOwnerRoute>
+              }
+            />
+            <Route path="/owner-transaksi.html" element={<Navigate to="/owner/transaksi" replace />} />
 
             <Route
               path="/owner/menu"

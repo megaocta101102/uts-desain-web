@@ -43,7 +43,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         
         {/* Brand Header */}
@@ -54,9 +54,6 @@ export const LoginPage: React.FC = () => {
           <h2 className="text-3xl font-extrabold text-slate-900 font-display">
             Login Staf <span className="text-blue-600">Meo Cafe</span>
           </h2>
-          <p className="text-sm text-slate-500">
-            Masuk untuk mengakses sistem kasir POS atau dashboard statistik.
-          </p>
         </div>
 
         {/* Login Card */}

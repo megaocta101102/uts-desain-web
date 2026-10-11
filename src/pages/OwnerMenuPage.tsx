@@ -191,9 +191,6 @@ export const OwnerMenuPage: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">
             Manajemen Katalog <span className="text-blue-600">Menu & Topping</span>
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Tambah, perbarui harga, ubah foto kuliner, dan atur ketersediaan menu cafe.
-          </p>
         </div>
 
         {/* Tab Switcher & Add Button */}
@@ -248,7 +245,7 @@ export const OwnerMenuPage: React.FC = () => {
             <div className="relative w-full sm:w-80">
               <input
                 type="text"
-                placeholder="Cari nama menu..."
+                placeholder="Cari"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="clay-input !pl-4 !pr-10 !py-2 text-xs"

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
   TrendingUp,
   DollarSign,
@@ -6,9 +7,8 @@ import {
   Calendar,
   Banknote,
   QrCode,
-  Download,
-  Search,
-  CalendarDays
+  ArrowRight,
+  Receipt
 } from 'lucide-react';
 import { Order, MenuItem } from '../types';
 import { db } from '../services/supabase';
@@ -24,7 +24,6 @@ export const OwnerStatistikPage: React.FC = () => {
   // Filter States
   const [timeRange, setTimeRange] = useState<TimeRangeFilter>('all');
   const [selectedYear, setSelectedYear] = useState<string>(new Date().getFullYear().toString());
-  const [tableSearchQuery, setTableSearchQuery] = useState('');
 
   useEffect(() => {
     async function loadStats() {
@@ -99,19 +98,6 @@ export const OwnerStatistikPage: React.FC = () => {
     });
   }, [orders, timeRange, selectedYear]);
 
-  // Search filter for table
-  const tableDisplayOrders = useMemo(() => {
-    if (!tableSearchQuery.trim()) return filteredOrders;
-    const q = tableSearchQuery.toLowerCase().trim();
-    return filteredOrders.filter(
-      (o) =>
-        o.order_number.toLowerCase().includes(q) ||
-        o.customer_name.toLowerCase().includes(q) ||
-        o.cashier_name.toLowerCase().includes(q) ||
-        o.payment_method.toLowerCase().includes(q)
-    );
-  }, [filteredOrders, tableSearchQuery]);
-
   // Key Metrics
   const totalRevenue = useMemo(() => {
     return filteredOrders
@@ -168,34 +154,6 @@ export const OwnerStatistikPage: React.FC = () => {
       .slice(0, 5);
   }, [filteredOrders]);
 
-  // Export CSV
-  const handleExportCSV = () => {
-    if (tableDisplayOrders.length === 0) {
-      alert('Tidak ada data untuk diexport.');
-      return;
-    }
-    const headers = ['No Order', 'Waktu', 'Pelanggan', 'Tipe', 'Total (Rp)', 'Metode Bayar', 'Kasir', 'Status'];
-    const rows = tableDisplayOrders.map((o) => [
-      o.order_number,
-      `"${new Date(o.created_at).toLocaleString('id-ID')}"`,
-      `"${o.customer_name}"`,
-      o.order_type,
-      o.total_amount,
-      o.payment_method,
-      `"${o.cashier_name}"`,
-      o.status,
-    ]);
-
-    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `laporan-transaksi-meocafe-${new Date().toISOString().slice(0, 10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   const getFilterLabel = () => {
     if (timeRange === 'today') return 'Hari Ini';
     if (timeRange === 'this_week') return 'Minggu Ini';
@@ -214,9 +172,6 @@ export const OwnerStatistikPage: React.FC = () => {
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight font-display">
             Statistik Penjualan <span className="text-blue-600">Meo Cafe</span>
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
-            Laporan omzet, pesanan terlaris, dan arus transaksi kasir.
-          </p>
         </div>
 
         {/* Filter Toolbar: Hari Ini, Minggu Ini, Bulan Ini, Tahun Ini, Pilih Tahun, Semua */}
@@ -484,102 +439,29 @@ export const OwnerStatistikPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Transaction Table with Search & CSV Finder in Right Box */}
-      <div className="clay-card p-6 bg-white space-y-4">
-        
-        {/* Table Header with Search & CSV Button on the RIGHT */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+      {/* Card Navigasi ke Halaman Lengkap Transaksi Kasir */}
+      <div className="clay-card p-6 bg-white border border-blue-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <Receipt className="w-6 h-6" />
+          </div>
           <div>
-            <h3 className="font-extrabold text-slate-900 text-lg font-sans">
-              Daftar Transaksi Kasir
+            <h3 className="font-extrabold text-slate-900 text-base font-sans">
+              Daftar Riwayat Transaksi Kasir
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Menampilkan {tableDisplayOrders.length} transaksi ({getFilterLabel()})
+              Kelola dan periksa seluruh pembukuan order pelanggan secara detail, filter periode, pencarian waktu, hingga unduh laporan CSV.
             </p>
           </div>
-
-          {/* Right Box: Search Input & CSV Export Button */}
-          <div className="flex items-center gap-2.5 w-full md:w-auto">
-            {/* Search Input Box with Glass Icon on Right Side */}
-            <div className="relative flex-1 md:w-64">
-              <input
-                type="text"
-                placeholder="Cari order / nama..."
-                value={tableSearchQuery}
-                onChange={(e) => setTableSearchQuery(e.target.value)}
-                className="clay-input !pl-3.5 !pr-9 !py-2 text-xs"
-              />
-              <Search className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            </div>
-
-            {/* CSV Export Button */}
-            <button
-              onClick={handleExportCSV}
-              className="clay-btn clay-btn-secondary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5 shrink-0"
-              title="Unduh laporan transaksi dalam format CSV"
-            >
-              <Download className="w-3.5 h-3.5" />
-              Export CSV
-            </button>
-          </div>
         </div>
 
-        {/* Table Content */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider">
-                <th className="pb-3 px-2">No. Order</th>
-                <th className="pb-3 px-2">Waktu</th>
-                <th className="pb-3 px-2">Pelanggan</th>
-                <th className="pb-3 px-2">Tipe</th>
-                <th className="pb-3 px-2">Total Bayar</th>
-                <th className="pb-3 px-2">Metode</th>
-                <th className="pb-3 px-2">Kasir</th>
-                <th className="pb-3 px-2 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {tableDisplayOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-400">
-                    Tidak ada data transaksi ditemukan.
-                  </td>
-                </tr>
-              ) : (
-                tableDisplayOrders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-2 font-bold text-slate-900">{ord.order_number}</td>
-                    <td className="py-3.5 px-2 text-slate-500">
-                      {new Date(ord.created_at).toLocaleString('id-ID', {
-                        dateStyle: 'short',
-                        timeStyle: 'short',
-                      })}
-                    </td>
-                    <td className="py-3.5 px-2 font-semibold text-slate-800">{ord.customer_name}</td>
-                    <td className="py-3.5 px-2">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 capitalize">
-                        {ord.order_type === 'dine_in' ? `Meja ${ord.table_number}` : 'Take Away'}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-2 font-extrabold text-blue-600">
-                      {formatCurrency(ord.total_amount)}
-                    </td>
-                    <td className="py-3.5 px-2 uppercase font-semibold text-slate-700">
-                      {ord.payment_method}
-                    </td>
-                    <td className="py-3.5 px-2 text-slate-600">{ord.cashier_name}</td>
-                    <td className="py-3.5 px-2 text-right">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                        {ord.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <Link
+          to="/owner/transaksi"
+          className="clay-btn clay-btn-primary !py-2.5 !px-5 text-xs font-semibold flex items-center justify-center gap-2 shrink-0 shadow-md"
+        >
+          <span>Lihat Semua Transaksi Kasir</span>
+          <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
     </div>
   );

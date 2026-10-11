@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Search,
   ShoppingCart,
@@ -22,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { ReceiptModal } from '../components/kasir/ReceiptModal';
 
 export const KasirPOSPage: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   // State
@@ -49,6 +51,23 @@ export const KasirPOSPage: React.FC = () => {
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Helper untuk filter transaksi hari ini saja (tugas kasir shift saat ini)
+  const isToday = (dateStr: string) => {
+    if (!dateStr) return false;
+    const d = new Date(dateStr);
+    const now = new Date();
+    return (
+      d.getFullYear() === now.getFullYear() &&
+      d.getMonth() === now.getMonth() &&
+      d.getDate() === now.getDate()
+    );
+  };
+
+  // Kasir POS hanya melihat riwayat transaksi sehari saja (hari bertugas)
+  const todayOrders = useMemo(() => {
+    return recentOrders.filter((ord) => isToday(ord.created_at));
+  }, [recentOrders]);
 
   // Load Initial Data
   useEffect(() => {
@@ -230,18 +249,15 @@ export const KasirPOSPage: React.FC = () => {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
             Point of Sale (POS) <span className="text-blue-600">Meo Cafe</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-            Kelola pesanan pelanggan meja atau bungkus dengan cepat dan presisi.
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setShowHistory(!showHistory)}
+            onClick={() => setShowHistory(true)}
             className="clay-btn clay-btn-secondary !py-2.5 !px-4 text-xs font-semibold flex items-center gap-2"
           >
-            <History className="w-4 h-4" />
-            <span>Riwayat Transaksi ({recentOrders.length})</span>
+            <History className="w-4 h-4 text-blue-600" />
+            <span>Riwayat Transaksi</span>
           </button>
         </div>
       </div>
@@ -257,7 +273,7 @@ export const KasirPOSPage: React.FC = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Ketik nama kopi, mocktail, makanan..."
+                placeholder="Cari"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="clay-input !pl-4 !pr-11 py-2.5 text-sm"
@@ -749,69 +765,95 @@ export const KasirPOSPage: React.FC = () => {
         </div>
       )}
 
-      {/* Transaction History Drawer Modal */}
+      {/* Transaction History Drawer Modal (Khusus Shift Hari Ini) */}
       {showHistory && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-blue-100 overflow-hidden flex flex-col max-h-[85vh]">
             <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <History className="w-5 h-5" />
-                <h3 className="font-bold text-base">Riwayat Transaksi Kasir</h3>
+              <div>
+                <div className="flex items-center gap-2">
+                  <History className="w-5 h-5" />
+                  <h3 className="font-bold text-base">Riwayat Transaksi Kasir (Hari Ini)</h3>
+                </div>
+                <p className="text-[11px] text-blue-100 mt-0.5">
+                  Khusus transaksi tugas hari ini ({new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })})
+                </p>
               </div>
               <button
                 onClick={() => setShowHistory(false)}
-                className="text-white/80 hover:text-white font-bold text-sm"
+                className="text-white/80 hover:text-white font-bold text-sm w-7 h-7 flex items-center justify-center rounded-full hover:bg-white/10"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-6 overflow-y-auto flex-1 space-y-3">
-              {recentOrders.length === 0 ? (
-                <p className="text-center text-slate-400 py-10 text-xs">
-                  Belum ada transaksi tercatat.
-                </p>
+            <div className="p-5 overflow-y-auto flex-1 space-y-3">
+              {todayOrders.length === 0 ? (
+                <div className="text-center py-10 space-y-1">
+                  <p className="text-slate-500 font-medium text-xs">
+                    Belum ada transaksi pada shift hari ini.
+                  </p>
+                  <p className="text-slate-400 text-[11px]">
+                    Riwayat kasir hanya menampilkan transaksi shift hari ini.
+                  </p>
+                </div>
               ) : (
-                recentOrders.map((ord) => (
-                  <div
-                    key={ord.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs text-slate-900">{ord.order_number}</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 capitalize">
-                          {ord.order_type === 'dine_in' ? `Meja ${ord.table_number}` : 'Take Away'}
-                        </span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">
-                          {ord.status}
+                <>
+                  {todayOrders.slice(0, 5).map((ord) => (
+                    <div
+                      key={ord.id}
+                      className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/50 transition-colors"
+                    >
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-xs text-slate-900">{ord.order_number}</span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700 capitalize">
+                            {ord.order_type === 'dine_in' ? `Meja ${ord.table_number}` : 'Take Away'}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 text-emerald-700">
+                            {ord.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-600 mt-1">
+                          {ord.customer_name} • {ord.items?.length || 0} item • Kasir: {ord.cashier_name}
+                        </p>
+                        <span className="text-[11px] text-slate-400">
+                          {new Date(ord.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {ord.customer_name} • {ord.items?.length || 0} item • Kasir: {ord.cashier_name}
-                      </p>
-                      <span className="text-[11px] text-slate-400">
-                        {new Date(ord.created_at).toLocaleString('id-ID')}
-                      </span>
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                      <span className="font-extrabold text-blue-600 text-sm">
-                        {formatCurrency(ord.total_amount)}
-                      </span>
-                      <button
-                        onClick={() => {
-                          setCompletedOrder(ord);
-                          setIsReceiptOpen(true);
-                        }}
-                        className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1"
-                      >
-                        <Receipt className="w-3.5 h-3.5" />
-                        Struk
-                      </button>
+                      <div className="flex items-center gap-3 justify-between sm:justify-end">
+                        <span className="font-extrabold text-blue-600 text-sm">
+                          {formatCurrency(ord.total_amount)}
+                        </span>
+                        <button
+                          onClick={() => {
+                            setCompletedOrder(ord);
+                            setIsReceiptOpen(true);
+                          }}
+                          className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs flex items-center gap-1"
+                        >
+                          <Receipt className="w-3.5 h-3.5" />
+                          Struk
+                        </button>
+                      </div>
                     </div>
+                  ))}
+
+                  {/* Tulisan bergaris bawah tanpa menyebutkan jumlah -> menuju ke halaman baru riwayat transaksi */}
+                  <div className="pt-3 border-t border-slate-100 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowHistory(false);
+                        navigate('/kasir/riwayat');
+                      }}
+                      className="text-blue-600 hover:text-blue-800 underline underline-offset-4 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                    >
+                      <u>Lihat semua riwayat transaksi</u>
+                    </button>
                   </div>
-                ))
+                </>
               )}
             </div>
 

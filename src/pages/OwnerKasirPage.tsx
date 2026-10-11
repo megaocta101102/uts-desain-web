@@ -395,7 +395,7 @@ export const OwnerKasirPage: React.FC = () => {
               <div className="relative flex-1">
                 <input
                   type="text"
-                  placeholder="Cari nama atau username kasir..."
+                  placeholder="Cari"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="clay-input !py-2 pl-4 pr-10 text-xs w-full"

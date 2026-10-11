@@ -89,6 +89,17 @@ export const Footer: React.FC = () => {
                 <p className="text-slate-300 text-xs leading-relaxed">
                   {DEFAULT_CONFIG.CAFE_ADDRESS}
                 </p>
+                <div className="pt-2">
+                  <a
+                    href={DEFAULT_CONFIG.CAFE_MAPS_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+                  >
+                    <span>Buka Petunjuk Arah di Maps</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </li>
             </ul>
           </div>
@@ -118,16 +129,6 @@ export const Footer: React.FC = () => {
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>
                 Melayani pesanan <strong>Dine-in</strong>, <strong>Takeaway</strong>, dan reservasi acara.
               </div>
-
-              <a
-                href={DEFAULT_CONFIG.CAFE_MAPS_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors pt-1"
-              >
-                <span>Buka Petunjuk Arah di Maps</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
             </div>
           </div>
 
