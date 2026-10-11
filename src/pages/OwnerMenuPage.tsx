@@ -12,7 +12,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping } from '../types';
-import { db } from '../services/supabase';
+import { db, normalizeMenuCategory } from '../services/supabase';
 import { formatCurrency } from '../services/config';
 
 export const OwnerMenuPage: React.FC = () => {
@@ -59,7 +59,8 @@ export const OwnerMenuPage: React.FC = () => {
 
   // Filter Menus
   const filteredMenus = menus.filter((m) => {
-    const matchCat = categoryFilter === 'all' || m.category === categoryFilter;
+    const itemCat = normalizeMenuCategory(m.category, m.type);
+    const matchCat = categoryFilter === 'all' || itemCat === categoryFilter;
     const matchSearch =
       m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (m.description && m.description.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -453,7 +454,7 @@ export const OwnerMenuPage: React.FC = () => {
                     className="clay-input !py-2 text-xs"
                   >
                     <option value="minuman">Minuman (Coffee/Mocktail)</option>
-                    <option value="makanan">Makanan Utama / Pastry</option>
+                    <option value="makanan">Makanan Berat / Utama</option>
                     <option value="snack">Snack & Bites</option>
                   </select>
                 </div>

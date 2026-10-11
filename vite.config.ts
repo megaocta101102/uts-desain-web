@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
           server.middlewares.use('/api/config', (req, res) => {
             const configData = {
               SUPABASE_URL: env.VITE_SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || 'https://ctcjauwqpfnvmcujvzoc.supabase.co',
-              SUPABASE_ANON_KEY: env.VITE_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+              SUPABASE_ANON_KEY: env.VITE_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_O2Yg2oOZwxZx8IhBQHJPjg_P_Vr9nLx',
               CAFE_NAME: env.CAFE_NAME || 'Meo Cafe',
               CAFE_TAGLINE: env.CAFE_TAGLINE || 'Aesthetic & Modern Coffee House',
               CAFE_ADDRESS: env.CAFE_ADDRESS || 'Jl. Pelabuhan Tanjuk Priok No.10, Bakalan Krajan, Sukun, Malang',

@@ -6,7 +6,7 @@ import {
   X,
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping } from '../types';
-import { db } from '../services/supabase';
+import { db, normalizeMenuCategory } from '../services/supabase';
 import { formatCurrency, DEFAULT_CONFIG } from '../services/config';
 
 export const LandingPage: React.FC = () => {
@@ -55,11 +55,12 @@ export const LandingPage: React.FC = () => {
   }, [selectedMenu]);
 
   const filteredMenus = menus.filter((menu) => {
+    const itemCat = normalizeMenuCategory(menu.category, menu.type);
     const matchesCategory =
-      selectedCategory === 'all' || menu.category === selectedCategory;
+      selectedCategory === 'all' || itemCat === selectedCategory;
     const matchesSearch =
       menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      menu.description.toLowerCase().includes(searchQuery.toLowerCase());
+      (menu.description || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -147,7 +148,7 @@ export const LandingPage: React.FC = () => {
           {[
             { id: 'all', label: 'Semua Menu' },
             { id: 'minuman', label: '☕ Minuman' },
-            { id: 'makanan', label: '🥐 Makanan' },
+            { id: 'makanan', label: '🍛 Makanan' },
             { id: 'snack', label: '🍟 Snack' },
           ].map((cat) => (
             <button
@@ -195,7 +196,7 @@ export const LandingPage: React.FC = () => {
                     />
                     <div className="absolute top-3 left-3">
                       <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 font-bold text-xs shadow-sm uppercase">
-                        {menu.category}
+                        {menu.subCategory || menu.category}
                       </span>
                     </div>
                     {menu.status === 'habis' && (
@@ -269,7 +270,7 @@ export const LandingPage: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent"></div>
                 <div className="absolute bottom-3 left-4">
                   <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-bold text-xs uppercase shadow-sm">
-                    {selectedMenu.category}
+                    {selectedMenu.subCategory || selectedMenu.category}
                   </span>
                 </div>
               </div>
@@ -302,7 +303,7 @@ export const LandingPage: React.FC = () => {
                       .filter(
                         (t) =>
                           t.category === 'all' ||
-                          t.category === selectedMenu.category
+                          t.category === normalizeMenuCategory(selectedMenu.category, selectedMenu.type)
                       )
                       .map((top) => (
                         <div

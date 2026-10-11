@@ -16,7 +16,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping, CartItem, SelectedTopping, OrderType, PaymentMethod, Order } from '../types';
-import { db } from '../services/supabase';
+import { db, normalizeMenuCategory } from '../services/supabase';
 import { formatCurrency, DEFAULT_CONFIG } from '../services/config';
 import { useAuth } from '../context/AuthContext';
 import { ReceiptModal } from '../components/kasir/ReceiptModal';
@@ -68,7 +68,8 @@ export const KasirPOSPage: React.FC = () => {
   // Filtered Menus
   const filteredMenus = useMemo(() => {
     return menus.filter((item) => {
-      const matchCat = selectedCategory === 'all' || item.category === selectedCategory;
+      const itemCat = normalizeMenuCategory(item.category, item.type);
+      const matchCat = selectedCategory === 'all' || itemCat === selectedCategory;
       const matchSearch =
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -268,7 +269,7 @@ export const KasirPOSPage: React.FC = () => {
               {[
                 { id: 'all', label: 'Semua' },
                 { id: 'minuman', label: '☕ Minuman' },
-                { id: 'makanan', label: '🥐 Makanan' },
+                { id: 'makanan', label: '🍛 Makanan' },
                 { id: 'snack', label: '🍟 Snack' },
               ].map((c) => (
                 <button

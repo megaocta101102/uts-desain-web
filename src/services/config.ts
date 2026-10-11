@@ -2,7 +2,7 @@ import { AppConfig } from '../types';
 
 export const DEFAULT_CONFIG: AppConfig = {
   SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL || 'https://ctcjauwqpfnvmcujvzoc.supabase.co',
-  SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
+  SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_O2Yg2oOZwxZx8IhBQHJPjg_P_Vr9nLx',
   CAFE_NAME: import.meta.env.VITE_CAFE_NAME || 'Meo Cafe',
   CAFE_TAGLINE: import.meta.env.VITE_CAFE_TAGLINE || 'Aesthetic & Modern Coffee House',
   CAFE_ADDRESS: import.meta.env.VITE_CAFE_ADDRESS || 'Jl. Pelabuhan Tanjuk Priok No.10, Bakalan Krajan, Sukun, Malang',

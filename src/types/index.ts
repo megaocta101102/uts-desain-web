@@ -16,6 +16,8 @@ export interface MenuItem {
   id: string;
   name: string;
   category: 'minuman' | 'makanan' | 'snack';
+  subCategory?: string;
+  type?: string;
   price: number;
   description?: string;
   image_url: string;

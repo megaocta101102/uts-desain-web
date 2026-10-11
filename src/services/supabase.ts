@@ -113,6 +113,75 @@ export const INITIAL_USERS: User[] = [
   },
 ];
 
+export function normalizeMenuCategory(rawCategory?: string, rawType?: string): 'minuman' | 'makanan' | 'snack' {
+  const type = (rawType || '').trim().toLowerCase();
+  const cat = (rawCategory || '').trim().toLowerCase();
+
+  // 1. Strict equality check
+  if (type === 'minuman' || cat === 'minuman') return 'minuman';
+  if (type === 'makanan' || cat === 'makanan') return 'makanan';
+  if (type === 'snack' || cat === 'snack') return 'snack';
+
+  // 2. Keyword checks for drinks/minuman
+  if (
+    type === 'drink' ||
+    type === 'beverage' ||
+    cat.includes('coffee') ||
+    cat.includes('kopi') ||
+    cat.includes('tea') ||
+    cat.includes('teh') ||
+    cat.includes('mocktail') ||
+    cat.includes('latte') ||
+    cat.includes('espresso') ||
+    cat.includes('minum') ||
+    cat.includes('drink') ||
+    cat.includes('beverage') ||
+    cat.includes('juice') ||
+    cat.includes('jus')
+  ) {
+    return 'minuman';
+  }
+
+  // 3. Keyword checks for snack
+  if (
+    type === 'snack' ||
+    cat.includes('snack') ||
+    cat.includes('pastry') ||
+    cat.includes('dessert') ||
+    cat.includes('fries') ||
+    cat.includes('bites') ||
+    cat.includes('tartlet') ||
+    cat.includes('croissant') ||
+    cat.includes('camilan') ||
+    cat.includes('cemilan') ||
+    cat.includes('churros')
+  ) {
+    return 'snack';
+  }
+
+  // 4. Keyword checks for makanan / main course
+  if (
+    type === 'food' ||
+    cat.includes('makan') ||
+    cat.includes('food') ||
+    cat.includes('course') ||
+    cat.includes('dish') ||
+    cat.includes('rice') ||
+    cat.includes('nasi') ||
+    cat.includes('mie') ||
+    cat.includes('noodle') ||
+    cat.includes('fettuccine') ||
+    cat.includes('pasta') ||
+    cat.includes('salmon') ||
+    cat.includes('steak') ||
+    cat.includes('beef')
+  ) {
+    return 'makanan';
+  }
+
+  return 'minuman';
+}
+
 class DatabaseService {
   private config = DEFAULT_CONFIG;
   private initialized = false;
@@ -308,16 +377,27 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            const sanitized: MenuItem[] = data.map((m: any) => ({
-              id: m.id || `m-${Date.now()}`,
-              name: m.name || '',
-              category: (m.category || m.type || 'minuman') as 'minuman' | 'makanan' | 'snack',
-              price: Number(m.price) || 0,
-              description: m.description || '',
-              image_url: m.image_url || '/assets/images/coffee_signature.jpg',
-              status: m.is_available === false ? 'habis' : 'tersedia',
-              created_at: m.created_at || new Date().toISOString(),
-            }));
+            const sanitized: MenuItem[] = data.map((m: any) => {
+              const primaryCat = normalizeMenuCategory(m.category, m.type);
+              const subCat = m.category && m.category.toLowerCase() !== primaryCat ? m.category : '';
+              const rawImg = m.image_url || '';
+              const formattedImg = rawImg
+                ? (rawImg.startsWith('http') || rawImg.startsWith('/') ? rawImg : `/${rawImg}`)
+                : '/assets/images/coffee_signature.jpg';
+
+              return {
+                id: m.id || `m-${Date.now()}`,
+                name: m.name || '',
+                category: primaryCat,
+                subCategory: subCat,
+                type: primaryCat,
+                price: Number(m.price) || 0,
+                description: m.description || '',
+                image_url: formattedImg,
+                status: m.is_available === false ? 'habis' : 'tersedia',
+                created_at: m.created_at || new Date().toISOString(),
+              };
+            });
             localStorage.setItem(STORAGE_KEYS.MENUS, JSON.stringify(sanitized));
             return sanitized;
           }
@@ -327,7 +407,19 @@ class DatabaseService {
       }
     }
     const local = localStorage.getItem(STORAGE_KEYS.MENUS);
-    return local ? JSON.parse(local) : INITIAL_MENUS;
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed.map((m: any) => ({
+            ...m,
+            category: normalizeMenuCategory(m.category, m.type),
+            subCategory: m.subCategory || (m.category && m.category !== normalizeMenuCategory(m.category, m.type) ? m.category : ''),
+          }));
+        }
+      } catch {}
+    }
+    return INITIAL_MENUS;
   }
 
   async saveMenu(item: Partial<MenuItem>): Promise<MenuItem> {

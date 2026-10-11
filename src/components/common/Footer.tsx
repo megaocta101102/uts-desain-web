@@ -38,11 +38,6 @@ export const Footer: React.FC = () => {
             <p className="text-slate-400 text-sm leading-relaxed">
               Tempat singgah nyaman di Kota Malang untuk menikmati racikan kopi istimewa, hidangan lezat, dan suasana hangat yang cocok untuk santai maupun bekerja.
             </p>
-
-            <div className="pt-2 text-xs text-slate-400">
-              <span className="block text-slate-500 font-medium mb-0.5">Pengelola / Owner:</span>
-              <span className="text-slate-200 font-semibold">{DEFAULT_CONFIG.OWNER_NAME}</span>
-            </div>
           </div>
 
           {/* Column 2: Hubungi Kami */}
