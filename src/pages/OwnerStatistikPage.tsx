@@ -500,16 +500,16 @@ export const OwnerStatistikPage: React.FC = () => {
 
           {/* Right Box: Search Input & CSV Export Button */}
           <div className="flex items-center gap-2.5 w-full md:w-auto">
-            {/* Search Input Box */}
+            {/* Search Input Box with Glass Icon on Right Side */}
             <div className="relative flex-1 md:w-64">
               <input
                 type="text"
                 placeholder="Cari order / nama..."
                 value={tableSearchQuery}
                 onChange={(e) => setTableSearchQuery(e.target.value)}
-                className="clay-input pl-9 pr-3 !py-2 text-xs"
+                className="clay-input !pl-3.5 !pr-9 !py-2 text-xs"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             {/* CSV Export Button */}

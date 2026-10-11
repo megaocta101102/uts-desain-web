@@ -88,6 +88,8 @@ export interface AppConfig {
   CAFE_TAGLINE: string;
   CAFE_ADDRESS: string;
   CAFE_MAPS_URL: string;
+  CAFE_PHONE: string;
+  CAFE_EMAIL: string;
   OWNER_NAME: string;
   CAFE_CURRENCY: string;
   CAFE_TAX_PERCENT: number;

@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import {
   Coffee,
   Search,
-  MapPin,
-  Clock,
   ChevronRight,
   ArrowRight,
+  X,
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping } from '../types';
 import { db } from '../services/supabase';
@@ -29,7 +28,7 @@ export const LandingPage: React.FC = () => {
         setMenus(menuData);
         setToppings(toppingData);
       } catch (err) {
-        console.error('Failed to load menu data', err);
+        console.error('Gagal memuat data menu', err);
       } finally {
         setIsLoading(false);
       }
@@ -37,26 +36,52 @@ export const LandingPage: React.FC = () => {
     loadData();
   }, []);
 
-  const filteredMenus = menus.filter((item) => {
+  // Handle escape key and prevent body scroll when modal is open
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedMenu(null);
+      }
+    };
+    if (selectedMenu) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedMenu]);
+
+  const filteredMenus = menus.filter((menu) => {
     const matchesCategory =
-      selectedCategory === 'all' || item.category === selectedCategory;
+      selectedCategory === 'all' || menu.category === selectedCategory;
     const matchesSearch =
-      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      menu.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      menu.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   return (
     <div className="space-y-16 pb-20">
-      {/* Hero Bento Section */}
-      <section id="hero" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 sm:pt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           
           {/* Main Hero Card (7 Cols) */}
-          <div className="lg:col-span-7 clay-card p-8 sm:p-12 flex flex-col justify-between bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20">
+          <div className="lg:col-span-7 clay-card p-8 sm:p-12 flex flex-col justify-between">
             <div>
-              <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-[1.18] font-display">
-                Harmoni Rasa & Ketenangan di <span className="text-blue-600">Meo Cafe</span>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/60 text-blue-700 text-xs font-semibold mb-6">
+                <Coffee className="w-3.5 h-3.5" />
+                <span>Specialty Coffee & Artisan Pastry</span>
+              </div>
+
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15] font-display">
+                Pengalaman Ngopi <br />
+                <span className="text-blue-600">Autentik & Modern.</span>
               </h1>
               
               <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed max-w-xl">
@@ -91,27 +116,14 @@ export const LandingPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Hero Visual Card (5 Cols) with Clean Cafe Name on Photo */}
-          <div className="lg:col-span-5 clay-card overflow-hidden relative min-h-[340px] lg:min-h-full flex flex-col justify-end p-8 group">
+          {/* Hero Visual Card (5 Cols) */}
+          <div className="lg:col-span-5 clay-card overflow-hidden relative min-h-[340px] lg:min-h-full group">
             <img
               src="/assets/images/hero_cafe.jpg"
               alt="Meo Cafe"
+              referrerPolicy="no-referrer"
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-900/20 to-transparent"></div>
-            
-            {/* Clean Cafe Name Overlay on Photo */}
-            <div className="relative z-10 text-white">
-              <span className="text-xs uppercase tracking-widest text-blue-300 font-bold block mb-1">
-                Kota Malang
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight font-display text-white">
-                Meo Cafe
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-200 mt-1">
-                Jl. Pelabuhan Tanjuk Priok No.10, Sukun
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -128,16 +140,16 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Search Box */}
+          {/* Search Box with Glass Icon on Right Side */}
           <div className="relative w-full md:w-80">
             <input
               type="text"
               placeholder="Cari kopi, pastry, snack..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="clay-input pl-11 pr-4 py-2.5 text-sm"
+              className="clay-input !pl-4 !pr-11 py-2.5 text-sm"
             />
-            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
         </div>
 
@@ -152,7 +164,7 @@ export const LandingPage: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id as MenuCategory)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
+              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
                 selectedCategory === cat.id
                   ? 'clay-btn-primary shadow-md'
                   : 'clay-btn-secondary'
@@ -163,79 +175,67 @@ export const LandingPage: React.FC = () => {
           ))}
         </div>
 
-        {/* Menu Cards Grid */}
+        {/* Menu Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-              <div key={n} className="clay-card p-4 space-y-4 animate-pulse">
-                <div className="w-full h-48 bg-slate-200 rounded-2xl"></div>
-                <div className="h-4 bg-slate-200 rounded w-3/4"></div>
-                <div className="h-3 bg-slate-200 rounded w-1/2"></div>
-                <div className="h-6 bg-slate-200 rounded w-1/3"></div>
-              </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="clay-card h-80 animate-pulse bg-slate-100"></div>
             ))}
           </div>
         ) : filteredMenus.length === 0 ? (
-          <div className="clay-card p-12 text-center max-w-md mx-auto">
-            <Coffee className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="font-bold text-slate-800 text-lg">Menu Tidak Ditemukan</h3>
-            <p className="text-slate-500 text-sm mt-1">
-              Coba gunakan kata kunci pencarian lain atau pilih kategori berbeda.
-            </p>
+          <div className="clay-card p-12 text-center text-slate-400">
+            <Coffee className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-base font-semibold text-slate-600">Tidak ada menu yang sesuai</p>
+            <p className="text-xs text-slate-400 mt-1">Coba kata kunci pencarian atau kategori lain.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredMenus.map((item) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredMenus.map((menu) => (
               <div
-                key={item.id}
-                className="clay-card overflow-hidden flex flex-col justify-between group hover:-translate-y-1.5 transition-all duration-300 bg-white"
+                key={menu.id}
+                onClick={() => setSelectedMenu(menu)}
+                className="clay-card overflow-hidden group cursor-pointer flex flex-col justify-between hover:-translate-y-1 transition-all duration-300"
               >
                 <div>
-                  {/* Image & Category Tag */}
-                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                  <div className="relative h-48 bg-slate-100 overflow-hidden">
                     <img
-                      src={item.image_url}
-                      alt={item.name}
+                      src={menu.image_url}
+                      alt={menu.name}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/images/coffee_signature.jpg';
-                      }}
                     />
                     <div className="absolute top-3 left-3">
-                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-white/90 backdrop-blur-md text-blue-700 shadow-sm">
-                        {item.category}
+                      <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 font-bold text-xs shadow-sm uppercase">
+                        {menu.category}
                       </span>
                     </div>
-                    {item.status === 'habis' && (
+                    {menu.status === 'habis' && (
                       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
-                        <span className="px-3 py-1 rounded-full bg-red-600 text-white font-bold text-xs uppercase">
+                        <span className="px-4 py-1.5 rounded-full bg-red-600 text-white font-bold text-xs uppercase tracking-wider">
                           Habis
                         </span>
                       </div>
                     )}
                   </div>
 
-                  {/* Body Content */}
                   <div className="p-5">
-                    <h3 className="font-bold text-slate-900 text-lg group-hover:text-blue-600 transition-colors leading-snug">
-                      {item.name}
-                    </h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors font-sans">
+                        {menu.name}
+                      </h3>
+                      <span className="text-base font-extrabold text-blue-600 shrink-0 font-sans">
+                        {formatCurrency(menu.price)}
+                      </span>
+                    </div>
                     <p className="text-slate-500 text-xs mt-2 line-clamp-2 leading-relaxed">
-                      {item.description || 'Pilihan menu istimewa Meo Cafe.'}
+                      {menu.description}
                     </p>
                   </div>
                 </div>
 
-                {/* Footer Action */}
-                <div className="p-5 pt-0 flex items-center justify-between border-t border-slate-100 mt-2">
-                  <span className="font-extrabold text-blue-600 text-lg">
-                    {formatCurrency(item.price)}
-                  </span>
-                  <button
-                    onClick={() => setSelectedMenu(item)}
-                    className="clay-btn clay-btn-secondary !py-2 !px-3.5 text-xs font-semibold flex items-center gap-1.5 hover:!bg-blue-600 hover:!text-white"
-                  >
-                    Detail & Topping
+                <div className="px-5 pb-5 pt-0">
+                  <button className="w-full py-2.5 rounded-2xl bg-blue-50/80 group-hover:bg-blue-600 group-hover:text-white text-blue-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-blue-100 group-hover:border-transparent">
+                    <span>Lihat Detail & Topping</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -245,118 +245,90 @@ export const LandingPage: React.FC = () => {
         )}
       </section>
 
-      {/* Cafe Information Bento (Clean 2 Columns: Lokasi & Jam) */}
-      <section id="infoSection" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Card 1: Lokasi */}
-          <div className="clay-card p-6 sm:p-8 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 font-display">Lokasi Kami</h3>
-            <p className="text-slate-600 text-sm leading-relaxed">
-              {DEFAULT_CONFIG.CAFE_ADDRESS}
-            </p>
-            <a
-              href={DEFAULT_CONFIG.CAFE_MAPS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:underline pt-2"
-            >
-              Buka di Google Maps
-              <ChevronRight className="w-4 h-4" />
-            </a>
-          </div>
-
-          {/* Card 2: Jam Operasional */}
-          <div className="clay-card p-6 sm:p-8 space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
-              <Clock className="w-6 h-6" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 font-display">Jam Operasional</h3>
-            <div className="space-y-1.5 text-sm text-slate-600">
-              <div className="flex justify-between">
-                <span>Senin - Jumat:</span>
-                <span className="font-semibold text-slate-900">09:00 - 23:00 WIB</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Sabtu - Minggu:</span>
-                <span className="font-semibold text-slate-900">08:00 - 00:00 WIB</span>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500 pt-2">
-              Buka setiap hari untuk dine-in dan takeaway.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Item Detail Modal */}
+      {/* Item Detail & Topping Modal */}
+      {/* Scrollable with fixed/sticky close button and footer so user can always return to beranda */}
       {selectedMenu && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            <div className="relative h-56 bg-slate-100">
-              <img
-                src={selectedMenu.image_url}
-                alt={selectedMenu.name}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => setSelectedMenu(null)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/80 backdrop-blur-md text-slate-800 flex items-center justify-center hover:bg-white shadow-md font-bold text-sm"
-              >
-                ✕
-              </button>
-              <div className="absolute bottom-4 left-4">
-                <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-bold text-xs uppercase">
-                  {selectedMenu.category}
-                </span>
-              </div>
-            </div>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedMenu(null);
+          }}
+        >
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-blue-100 flex flex-col max-h-[85vh] sm:max-h-[88vh] overflow-hidden relative">
+            
+            {/* Sticky/Fixed Close Button (✕) - ALWAYS visible, stays in place, never scrolls away */}
+            <button
+              onClick={() => setSelectedMenu(null)}
+              className="absolute top-3 right-3 z-30 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-slate-800 hover:text-red-600 flex items-center justify-center shadow-lg border border-slate-200/80 transition-all active:scale-95 font-bold text-base cursor-pointer"
+              title="Tutup dan kembali ke beranda (Esc)"
+              aria-label="Tutup modal dan kembali ke beranda"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-            <div className="p-6 space-y-5">
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 font-display">{selectedMenu.name}</h3>
-                <p className="text-slate-600 text-sm mt-2">{selectedMenu.description}</p>
-                <div className="text-2xl font-extrabold text-blue-600 mt-3">
-                  {formatCurrency(selectedMenu.price)}
+            {/* Scrollable Inner Body (Dapat discroll bebas pada laptop kecil maupun HP) */}
+            <div className="overflow-y-auto overscroll-contain flex-1">
+              
+              {/* Image Banner */}
+              <div className="relative h-48 sm:h-56 bg-slate-100">
+                <img
+                  src={selectedMenu.image_url}
+                  alt={selectedMenu.name}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent"></div>
+                <div className="absolute bottom-3 left-4">
+                  <span className="px-3 py-1 rounded-full bg-blue-600 text-white font-bold text-xs uppercase shadow-sm">
+                    {selectedMenu.category}
+                  </span>
                 </div>
               </div>
 
-              {/* Compatible Toppings */}
-              <div className="space-y-2 border-t border-slate-100 pt-4">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Pilihan Tambahan Topping
-                </h4>
-                <div className="grid grid-cols-2 gap-2">
-                  {toppings
-                    .filter(
-                      (t) =>
-                        t.category === 'all' ||
-                        t.category === selectedMenu.category
-                    )
-                    .map((top) => (
-                      <div
-                        key={top.id}
-                        className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs"
-                      >
-                        <span className="font-semibold text-slate-700">{top.name}</span>
-                        <span className="text-blue-600 font-bold">+{formatCurrency(top.price)}</span>
-                      </div>
-                    ))}
+              {/* Menu Details & Compatible Toppings */}
+              <div className="p-5 sm:p-6 space-y-5">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-display">
+                    {selectedMenu.name}
+                  </h3>
+                  <p className="text-slate-600 text-sm mt-1.5 leading-relaxed">
+                    {selectedMenu.description}
+                  </p>
+                  <div className="text-2xl font-extrabold text-blue-600 mt-3 font-sans">
+                    {formatCurrency(selectedMenu.price)}
+                  </div>
+                </div>
+
+                {/* Compatible Toppings Section */}
+                <div className="space-y-2.5 border-t border-slate-100 pt-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                      Pilihan Tambahan Topping
+                    </h4>
+                    <span className="text-[11px] text-slate-400">Pesan langsung saat order</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {toppings
+                      .filter(
+                        (t) =>
+                          t.category === 'all' ||
+                          t.category === selectedMenu.category
+                      )
+                      .map((top) => (
+                        <div
+                          key={top.id}
+                          className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs"
+                        >
+                          <span className="font-semibold text-slate-700">{top.name}</span>
+                          <span className="text-blue-600 font-bold">+{formatCurrency(top.price)}</span>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               </div>
-
-              <div className="pt-2 flex items-center justify-end">
-                <button
-                  onClick={() => setSelectedMenu(null)}
-                  className="clay-btn clay-btn-secondary !py-2.5 !px-6 text-sm"
-                >
-                  Tutup
-                </button>
-              </div>
             </div>
+
           </div>
         </div>
       )}

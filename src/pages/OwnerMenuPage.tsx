@@ -250,9 +250,9 @@ export const OwnerMenuPage: React.FC = () => {
                 placeholder="Cari nama menu..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="clay-input pl-10 !py-2 text-xs"
+                className="clay-input !pl-4 !pr-10 !py-2 text-xs"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
@@ -409,20 +409,20 @@ export const OwnerMenuPage: React.FC = () => {
       {/* Menu Modal */}
       {isMenuModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-blue-100 overflow-hidden flex flex-col max-h-[88vh]">
+            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between shrink-0">
               <h3 className="font-bold text-base">
                 {editingMenu ? 'Edit Data Menu' : 'Tambah Menu Baru'}
               </h3>
               <button
                 onClick={() => setIsMenuModalOpen(false)}
-                className="text-white/80 hover:text-white font-bold"
+                className="text-white/80 hover:text-white font-bold p-1"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSaveMenu} className="p-6 space-y-4">
+            <form onSubmit={handleSaveMenu} className="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">
                   Nama Menu *
@@ -573,20 +573,20 @@ export const OwnerMenuPage: React.FC = () => {
       {/* Topping Modal */}
       {isToppingModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
+          <div className="bg-white w-full max-w-sm rounded-3xl shadow-2xl border border-blue-100 overflow-hidden flex flex-col max-h-[88vh]">
+            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between shrink-0">
               <h3 className="font-bold text-base">
                 {editingTopping ? 'Edit Topping' : 'Tambah Topping Baru'}
               </h3>
               <button
                 onClick={() => setIsToppingModalOpen(false)}
-                className="text-white/80 hover:text-white font-bold"
+                className="text-white/80 hover:text-white font-bold p-1"
               >
                 ✕
               </button>
             </div>
 
-            <form onSubmit={handleSaveTopping} className="p-6 space-y-4">
+            <form onSubmit={handleSaveTopping} className="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">
                   Nama Topping *

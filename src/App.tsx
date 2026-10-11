@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Navbar } from './components/common/Navbar';
+import { Footer } from './components/common/Footer';
 import { LazyFallback } from './components/common/LazyFallback';
 
 // Lazy-loaded pages for optimal performance and chunk splitting
@@ -108,17 +109,8 @@ const AppContent: React.FC = () => {
         </Suspense>
       </main>
 
-      {/* Aesthetic Footer */}
-      <footer className="bg-white/80 border-t border-blue-100 py-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>
-            © {new Date().getFullYear()} <strong>Meo Cafe</strong> • All Rights Reserved.
-          </span>
-          <span className="text-slate-400">
-            Dikelola oleh Owner Mega Octa • Jl. Pelabuhan Tanjuk Priok No.10, Malang
-          </span>
-        </div>
-      </footer>
+      {/* Structured, clean standard footer */}
+      <Footer />
     </div>
   );
 };

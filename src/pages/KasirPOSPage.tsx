@@ -259,9 +259,9 @@ export const KasirPOSPage: React.FC = () => {
                 placeholder="Ketik nama kopi, mocktail, makanan..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="clay-input pl-11 py-2.5 text-sm"
+                className="clay-input !pl-4 !pr-11 py-2.5 text-sm"
               />
-              <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
 
             <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -520,21 +520,21 @@ export const KasirPOSPage: React.FC = () => {
       {/* Topping Modifier Modal */}
       {toppingModalItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-blue-100 overflow-hidden flex flex-col max-h-[85vh]">
+            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-bold text-base">{toppingModalItem.name}</h3>
                 <span className="text-xs text-blue-100">{formatCurrency(toppingModalItem.price)}</span>
               </div>
               <button
                 onClick={() => setToppingModalItem(null)}
-                className="text-white/80 hover:text-white font-bold text-sm"
+                className="text-white/80 hover:text-white font-bold text-sm p-1"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 space-y-4 overflow-y-auto flex-1 overscroll-contain">
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-2.5">
                   Pilih Tambahan Topping / Modifier
@@ -626,21 +626,21 @@ export const KasirPOSPage: React.FC = () => {
       {/* Payment Method Modal */}
       {isPaymentOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-blue-100 overflow-hidden">
-            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between">
+          <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-blue-100 overflow-hidden flex flex-col max-h-[88vh]">
+            <div className="p-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-center justify-between shrink-0">
               <div>
                 <h3 className="font-bold text-base">Proses Pembayaran</h3>
                 <span className="text-xs text-blue-100">Total: {formatCurrency(totalAmount)}</span>
               </div>
               <button
                 onClick={() => setIsPaymentOpen(false)}
-                className="text-white/80 hover:text-white font-bold text-sm"
+                className="text-white/80 hover:text-white font-bold text-sm p-1"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-6 space-y-5">
+            <div className="p-6 space-y-5 overflow-y-auto flex-1 overscroll-contain">
               {/* Method Selector */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">

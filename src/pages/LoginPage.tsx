@@ -80,9 +80,9 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Masukkan username"
                   required
-                  className="clay-input pl-11"
+                  className="clay-input !pl-4 !pr-11"
                 />
-                <User className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
@@ -97,9 +97,9 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
                   required
-                  className="clay-input pl-11"
+                  className="clay-input !pl-4 !pr-11"
                 />
-                <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-slate-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
