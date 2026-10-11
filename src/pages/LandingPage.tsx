@@ -3,7 +3,6 @@ import {
   Coffee,
   Search,
   ChevronRight,
-  ArrowRight,
   X,
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping } from '../types';
@@ -87,16 +86,6 @@ export const LandingPage: React.FC = () => {
               <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed max-w-xl">
                 Nikmati sentuhan biji kopi single origin pilihan, seduhan teh botanikal alami, dan pastry Prancis berlapis mentega murni.
               </p>
-
-              <div className="mt-8 flex items-center">
-                <a
-                  href="#menuSection"
-                  className="clay-btn clay-btn-primary"
-                >
-                  Lihat Daftar Menu
-                  <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
             </div>
 
             {/* Stats Row */}
