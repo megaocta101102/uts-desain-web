@@ -1,5 +1,6 @@
 import React from 'react';
 import { Printer, CheckCircle, X, Download } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Order } from '../../types';
 import { formatCurrency, DEFAULT_CONFIG } from '../../services/config';
 
@@ -129,6 +130,24 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, isOpen, onClo
                 <span>Kembalian:</span>
                 <span>{formatCurrency(order.change_amount)}</span>
               </div>
+            </div>
+
+            {/* Customer Satisfaction QR */}
+            <div className="pt-3 border-t border-dashed border-slate-300 flex flex-col items-center text-center space-y-1.5">
+              <span className="text-[10px] font-bold text-slate-700 tracking-wider uppercase font-sans">
+                Kepuasan Pelanggan
+              </span>
+              <div className="p-1.5 bg-white border border-slate-300 rounded-lg inline-block shadow-xs">
+                <QRCodeSVG
+                  value="https://forms.gle/meocafe-feedback"
+                  size={84}
+                  level="M"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-[9px] text-slate-500">
+                Scan QR untuk penilaian & ulasan Anda
+              </p>
             </div>
 
             {/* Footer Message */}

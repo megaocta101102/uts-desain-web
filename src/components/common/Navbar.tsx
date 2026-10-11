@@ -190,15 +190,7 @@ export const Navbar: React.FC = () => {
                   <LogOut className="w-4 h-4" />
                 </button>
               </div>
-            ) : isLogin ? (
-              <Link
-                to="/"
-                className="clay-btn clay-btn-secondary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                Beranda
-              </Link>
-            ) : (
+            ) : isLogin ? null : (
               <Link
                 to="/login"
                 className="clay-btn clay-btn-primary !py-2.5 !px-5 text-sm flex items-center gap-2"
