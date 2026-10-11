@@ -79,75 +79,77 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation Links (Untouched as requested: 'pada tampilan desktop biarin') */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-full border border-slate-200/60">
-            {isOwnerArea ? (
-              <>
-                <Link
-                  to="/owner/statistik"
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                    location.pathname === '/owner/statistik'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Statistik
-                </Link>
-                <Link
-                  to="/owner/menu"
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                    location.pathname === '/owner/menu'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Utensils className="w-4 h-4" />
-                  Kelola Menu
-                </Link>
-                <Link
-                  to="/owner/kasir"
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                    location.pathname === '/owner/kasir'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  <Users className="w-4 h-4" />
-                  Kontrol Akun
-                </Link>
-              </>
-            ) : isKasirArea ? (
-              <span className="px-4 py-1.5 text-sm font-medium text-slate-700">
-                Kasir POS
-              </span>
-            ) : (
-              <>
-                <Link
-                  to="/"
-                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                    location.pathname === '/'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Beranda
-                </Link>
-                <a
-                  href="/#menuSection"
-                  className="px-4 py-2 rounded-full text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all"
-                >
-                  Daftar Menu
-                </a>
-                <a
-                  href="/#infoSection"
-                  className="px-4 py-2 rounded-full text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all"
-                >
-                  Kontak & Info
-                </a>
-              </>
-            )}
-          </nav>
+          {/* Desktop Navigation Links */}
+          {!isLogin && (
+            <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-full border border-slate-200/60">
+              {isOwnerArea ? (
+                <>
+                  <Link
+                    to="/owner/statistik"
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                      location.pathname === '/owner/statistik'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <LayoutDashboard className="w-4 h-4" />
+                    Statistik
+                  </Link>
+                  <Link
+                    to="/owner/menu"
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                      location.pathname === '/owner/menu'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Utensils className="w-4 h-4" />
+                    Kelola Menu
+                  </Link>
+                  <Link
+                    to="/owner/kasir"
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                      location.pathname === '/owner/kasir'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Users className="w-4 h-4" />
+                    Kontrol Akun
+                  </Link>
+                </>
+              ) : isKasirArea ? (
+                <span className="px-4 py-1.5 text-sm font-medium text-slate-700">
+                  Kasir POS
+                </span>
+              ) : (
+                <>
+                  <Link
+                    to="/"
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                      location.pathname === '/'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Beranda
+                  </Link>
+                  <a
+                    href="/#menuSection"
+                    className="px-4 py-2 rounded-full text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all"
+                  >
+                    Daftar Menu
+                  </a>
+                  <a
+                    href="/#infoSection"
+                    className="px-4 py-2 rounded-full text-sm font-semibold text-slate-600 hover:text-slate-900 transition-all"
+                  >
+                    Kontak & Info
+                  </a>
+                </>
+              )}
+            </nav>
+          )}
 
           {/* Right Actions */}
           <div className="flex items-center gap-2 sm:gap-3">
