@@ -56,6 +56,14 @@ export const OwnerStatistikPage: React.FC = () => {
     return Array.from(yearsSet).sort((a, b) => Number(b) - Number(a));
   }, [orders]);
 
+  const isSameDay = (d1: Date, d2: Date) => {
+    return (
+      d1.getFullYear() === d2.getFullYear() &&
+      d1.getMonth() === d2.getMonth() &&
+      d1.getDate() === d2.getDate()
+    );
+  };
+
   // Helper date calculation
   const getStartOfWeek = (d: Date) => {
     const date = new Date(d);
@@ -69,27 +77,29 @@ export const OwnerStatistikPage: React.FC = () => {
   // Filtered Orders by Time Range
   const filteredOrders = useMemo(() => {
     const now = new Date();
-    const todayStr = now.toISOString().slice(0, 10);
-    const thisMonthStr = now.toISOString().slice(0, 7);
-    const thisYearStr = now.getFullYear().toString();
     const startOfWeek = getStartOfWeek(now);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
 
     return orders.filter((o) => {
       if (!o.created_at) return false;
       const orderDate = new Date(o.created_at);
-      const orderDateIso = orderDate.toISOString();
 
       if (timeRange === 'today') {
-        return orderDateIso.startsWith(todayStr);
+        return isSameDay(orderDate, now);
       }
       if (timeRange === 'this_week') {
-        return orderDate >= startOfWeek && orderDate <= now;
+        return orderDate >= startOfWeek && orderDate <= endOfWeek;
       }
       if (timeRange === 'this_month') {
-        return orderDateIso.startsWith(thisMonthStr);
+        return (
+          orderDate.getFullYear() === now.getFullYear() &&
+          orderDate.getMonth() === now.getMonth()
+        );
       }
       if (timeRange === 'this_year') {
-        return orderDateIso.startsWith(thisYearStr);
+        return orderDate.getFullYear() === now.getFullYear();
       }
       if (timeRange === 'by_year') {
         return orderDate.getFullYear().toString() === selectedYear;
@@ -115,9 +125,9 @@ export const OwnerStatistikPage: React.FC = () => {
 
   // Metric Today
   const todayRevenue = useMemo(() => {
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const now = new Date();
     return orders
-      .filter((o) => o.status !== 'dibatalkan' && new Date(o.created_at).toISOString().startsWith(todayStr))
+      .filter((o) => o.status !== 'dibatalkan' && o.created_at && isSameDay(new Date(o.created_at), now))
       .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   }, [orders]);
 
@@ -127,8 +137,9 @@ export const OwnerStatistikPage: React.FC = () => {
     let qris = 0;
     filteredOrders.forEach((o) => {
       if (o.status !== 'dibatalkan') {
-        if (o.payment_method === 'cash') cash += o.total_amount;
-        else qris += o.total_amount;
+        const amt = Number(o.total_amount) || 0;
+        if (o.payment_method === 'cash') cash += amt;
+        else qris += amt;
       }
     });
     return { cash, qris, total: cash + qris || 1 };
@@ -138,14 +149,16 @@ export const OwnerStatistikPage: React.FC = () => {
   const topSelling = useMemo(() => {
     const itemMap: Record<string, { name: string; count: number; revenue: number }> = {};
     filteredOrders.forEach((o) => {
-      if (o.status !== 'dibatalkan' && o.items) {
+      if (o.status !== 'dibatalkan' && Array.isArray(o.items) && o.items.length > 0) {
         o.items.forEach((it) => {
           const key = it.menu_name || 'Item';
           if (!itemMap[key]) {
             itemMap[key] = { name: key, count: 0, revenue: 0 };
           }
-          itemMap[key].count += it.quantity || 1;
-          itemMap[key].revenue += it.subtotal || 0;
+          const qty = Number(it.quantity) || 1;
+          const rev = Number(it.subtotal) || (Number(it.price || 0) * qty) || 0;
+          itemMap[key].count += qty;
+          itemMap[key].revenue += rev;
         });
       }
     });
@@ -387,7 +400,7 @@ export const OwnerStatistikPage: React.FC = () => {
           <div>
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="font-extrabold text-slate-900 text-base font-sans">
-                💳 Saluran Pembayaran ({getFilterLabel()})
+                💳 Metode Pembayaran ({getFilterLabel()})
               </h3>
               <span className="text-xs text-slate-400">Tunai vs Non-Tunai</span>
             </div>
@@ -398,7 +411,7 @@ export const OwnerStatistikPage: React.FC = () => {
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="flex items-center gap-1.5 text-slate-700">
                     <Banknote className="w-4 h-4 text-emerald-600" />
-                    Tunai (Cash)
+                    Tunai
                   </span>
                   <span className="text-slate-900">{formatCurrency(paymentBreakdown.cash)}</span>
                 </div>
@@ -417,7 +430,7 @@ export const OwnerStatistikPage: React.FC = () => {
                 <div className="flex justify-between text-xs font-semibold">
                   <span className="flex items-center gap-1.5 text-slate-700">
                     <QrCode className="w-4 h-4 text-blue-600" />
-                    QRIS / Digital
+                    QRIS
                   </span>
                   <span className="text-slate-900">{formatCurrency(paymentBreakdown.qris)}</span>
                 </div>
@@ -450,7 +463,7 @@ export const OwnerStatistikPage: React.FC = () => {
               Daftar Riwayat Transaksi Kasir
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Kelola dan periksa seluruh pembukuan order pelanggan secara detail, filter periode, pencarian waktu, hingga unduh laporan CSV.
+              Pemeriksaan pembukuan order pelanggan secara detail dan unduh laporan CSV
             </p>
           </div>
         </div>

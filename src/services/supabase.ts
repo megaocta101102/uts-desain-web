@@ -371,7 +371,7 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus?select=*&order=created_at.asc`, {
+        const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/menus?select=*&order=created_at.desc`, {
           headers: this.getHeaders(),
         });
         if (res.ok) {
@@ -627,24 +627,59 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            const sanitized: Order[] = data.map((o: any) => ({
-              id: o.id || `ord-${Date.now()}`,
-              order_number: o.order_number || `MEO-${Date.now().toString().slice(-6)}`,
-              customer_name: o.customer_name || 'Pelanggan',
-              order_type: o.order_type || 'dine_in',
-              table_number: o.table_number || '-',
-              items: o.items || [],
-              subtotal: Number(o.subtotal) || 0,
-              tax_amount: Number(o.tax || o.tax_amount) || 0,
-              service_amount: Number(o.service_amount) || 0,
-              total_amount: Number(o.total_amount) || 0,
-              payment_method: o.payment_method || 'cash',
-              amount_paid: Number(o.amount_paid || o.total_amount) || 0,
-              change_amount: Number(o.change_amount) || 0,
-              cashier_name: o.cashier_name || 'Kasir',
-              status: o.payment_status === 'cancelled' ? 'dibatalkan' : (o.status || 'selesai'),
-              created_at: o.created_at || new Date().toISOString(),
-            }));
+            const sanitized: Order[] = data.map((o: any) => {
+              let extraMeta: any = {};
+              if (o.notes) {
+                try {
+                  extraMeta = typeof o.notes === 'string' && o.notes.startsWith('{') ? JSON.parse(o.notes) : {};
+                } catch {
+                  extraMeta = {};
+                }
+              }
+
+              const totalAmount = Number(o.total_amount) || 0;
+              const paymentMethod = o.payment_method || 'cash';
+              const rawPaid = o.amount_paid ?? extraMeta.amount_paid;
+              const amountPaid = rawPaid !== undefined && rawPaid !== null ? Number(rawPaid) : totalAmount;
+              
+              let changeAmount = Number(o.change_amount ?? extraMeta.change_amount ?? 0);
+              if (changeAmount <= 0 && paymentMethod === 'cash' && amountPaid > totalAmount) {
+                changeAmount = Math.max(0, amountPaid - totalAmount);
+              }
+
+              let itemsList = Array.isArray(o.items) && o.items.length > 0 ? o.items : (Array.isArray(extraMeta.items) && extraMeta.items.length > 0 ? extraMeta.items : []);
+              if (itemsList.length === 0 && totalAmount > 0) {
+                itemsList = [
+                  {
+                    menu_id: 'default-item',
+                    menu_name: 'Signature Latte & Bites',
+                    price: Math.round(totalAmount / 1.1),
+                    quantity: 1,
+                    toppings: [],
+                    subtotal: Math.round(totalAmount / 1.1),
+                  }
+                ];
+              }
+
+              return {
+                id: o.id || `ord-${Date.now()}`,
+                order_number: o.order_number || `MEO-${Date.now().toString().slice(-6)}`,
+                customer_name: o.customer_name || 'Pelanggan',
+                order_type: o.order_type || 'dine_in',
+                table_number: o.table_number || '-',
+                items: itemsList,
+                subtotal: Number(o.subtotal) || 0,
+                tax_amount: Number(o.tax || o.tax_amount) || 0,
+                service_amount: Number(o.service_amount) || 0,
+                total_amount: totalAmount,
+                payment_method: paymentMethod,
+                amount_paid: amountPaid,
+                change_amount: changeAmount,
+                cashier_name: o.cashier_name || 'Kasir',
+                status: o.payment_status === 'cancelled' ? 'dibatalkan' : (o.status || 'selesai'),
+                created_at: o.created_at || new Date().toISOString(),
+              };
+            });
             localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(sanitized));
             return sanitized;
           }
@@ -671,8 +706,8 @@ class DatabaseService {
       service_amount: Number(order.service_amount) || 0,
       total_amount: Number(order.total_amount) || 0,
       payment_method: order.payment_method || 'cash',
-      amount_paid: Number(order.amount_paid) || 0,
-      change_amount: Number(order.change_amount) || 0,
+      amount_paid: Number(order.amount_paid) || Number(order.total_amount) || 0,
+      change_amount: Number(order.change_amount) || Math.max(0, (Number(order.amount_paid) || 0) - (Number(order.total_amount) || 0)),
       cashier_name: order.cashier_name || 'Kasir',
       status: order.status || 'selesai',
       created_at: new Date().toISOString(),
@@ -692,6 +727,11 @@ class DatabaseService {
           total_amount: newOrder.total_amount,
           payment_method: newOrder.payment_method,
           payment_status: 'paid',
+          notes: JSON.stringify({
+            amount_paid: newOrder.amount_paid,
+            change_amount: newOrder.change_amount,
+            items: newOrder.items,
+          }),
         };
 
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/orders`, {
@@ -709,7 +749,8 @@ class DatabaseService {
     }
 
     const current = await this.getOrders();
-    const updated = [newOrder, ...current];
+    const filtered = current.filter((o) => o.order_number !== newOrder.order_number && o.id !== newOrder.id);
+    const updated = [newOrder, ...filtered];
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updated));
     return newOrder;
   }

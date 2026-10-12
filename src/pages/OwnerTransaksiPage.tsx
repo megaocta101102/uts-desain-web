@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Search,
   Download,
@@ -6,6 +7,7 @@ import {
   Banknote,
   QrCode,
   ArrowUp,
+  ArrowLeft,
   Receipt,
   RefreshCw,
   ShoppingBag,
@@ -320,6 +322,14 @@ export const OwnerTransaksiPage: React.FC = () => {
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               <span>Muat Ulang</span>
             </button>
+            <Link
+              to="/owner/statistik"
+              className="clay-btn clay-btn-primary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5 shadow-sm"
+              title="Kembali ke Dashboard Statistik"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Kembali</span>
+            </Link>
           </div>
         </div>
 
@@ -516,23 +526,22 @@ export const OwnerTransaksiPage: React.FC = () => {
           <div className="overflow-x-auto rounded-2xl border border-slate-100">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50/80">
-                <tr className="border-b border-slate-200 text-slate-400 font-bold uppercase tracking-wider text-[11px]">
-                  <th className="py-3 px-3">No. Order</th>
-                  <th className="py-3 px-3">Waktu</th>
-                  <th className="py-3 px-3">Pelanggan</th>
-                  <th className="py-3 px-3">Tipe</th>
-                  <th className="py-3 px-3">Kasir</th>
-                  <th className="py-3 px-3">Menu Dipesan</th>
-                  <th className="py-3 px-3">Metode</th>
-                  <th className="py-3 px-3">Total Bayar</th>
-                  <th className="py-3 px-3">Status</th>
-                  <th className="py-3 px-3 text-center">Aksi</th>
+                <tr className="border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                  <th className="py-3.5 px-4">Waktu</th>
+                  <th className="py-3.5 px-4">No. Order</th>
+                  <th className="py-3.5 px-4">Tipe / Meja</th>
+                  <th className="py-3.5 px-4">Pelanggan</th>
+                  <th className="py-3.5 px-4">Kasir</th>
+                  <th className="py-3.5 px-4">Rincian Menu</th>
+                  <th className="py-3.5 px-4">Metode</th>
+                  <th className="py-3.5 px-4 text-right">Total Tagihan</th>
+                  <th className="py-3.5 px-4 text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
                 {isLoading ? (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-slate-400">
+                    <td colSpan={9} className="py-12 text-center text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
                         <span>Memuat daftar transaksi...</span>
@@ -541,7 +550,7 @@ export const OwnerTransaksiPage: React.FC = () => {
                   </tr>
                 ) : displayOrders.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="py-12 text-center text-slate-400">
+                    <td colSpan={9} className="py-12 text-center text-slate-400">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <ShoppingBag className="w-8 h-8 text-slate-300" />
                         <span className="font-semibold text-slate-700">
@@ -567,108 +576,106 @@ export const OwnerTransaksiPage: React.FC = () => {
                     </td>
                   </tr>
                 ) : (
-                  displayOrders.map((ord) => (
-                    <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
-                      {/* No Order */}
-                      <td className="py-3.5 px-3 font-bold text-slate-900 font-mono">
-                        {ord.order_number}
-                      </td>
+                  displayOrders.map((ord) => {
+                    const timeFormatted = new Date(ord.created_at).toLocaleString('id-ID', {
+                      dateStyle: selectedDate ? undefined : 'short',
+                      timeStyle: 'short'
+                    });
 
-                      {/* Waktu */}
-                      <td className="py-3.5 px-3 text-slate-600 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-slate-400" />
-                          <span>
-                            {new Date(ord.created_at).toLocaleString('id-ID', {
-                              dateStyle: selectedDate ? undefined : 'short',
-                              timeStyle: 'short'
-                            })}
+                    return (
+                      <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
+                        {/* Waktu */}
+                        <td className="py-3.5 px-4 text-slate-600 whitespace-nowrap font-medium">
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{timeFormatted}</span>
+                          </div>
+                        </td>
+
+                        {/* No Order */}
+                        <td className="py-3.5 px-4 font-bold text-slate-900 font-mono whitespace-nowrap">
+                          {ord.order_number}
+                        </td>
+
+                        {/* Tipe / Meja */}
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-[10px] font-bold inline-flex items-center gap-1 ${
+                              ord.order_type === 'dine_in'
+                                ? 'bg-blue-100 text-blue-700'
+                                : 'bg-emerald-100 text-emerald-700'
+                            }`}
+                          >
+                            {ord.order_type === 'dine_in' ? `Meja ${ord.table_number || '-'}` : 'Take Away'}
                           </span>
-                        </div>
-                      </td>
+                        </td>
 
-                      {/* Pelanggan */}
-                      <td className="py-3.5 px-3 font-semibold text-slate-800">
-                        {ord.customer_name || 'Pelanggan'}
-                      </td>
+                        {/* Pelanggan */}
+                        <td className="py-3.5 px-4 font-semibold text-slate-800">
+                          {ord.customer_name || 'Pelanggan'}
+                        </td>
 
-                      {/* Tipe */}
-                      <td className="py-3.5 px-3 whitespace-nowrap">
-                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 capitalize">
-                          {ord.order_type === 'dine_in' ? `Meja ${ord.table_number || '-'}` : 'Take Away'}
-                        </span>
-                      </td>
+                        {/* Kasir */}
+                        <td className="py-3.5 px-4 whitespace-nowrap text-slate-700">
+                          <span className="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md text-[11px] font-medium">
+                            <UserCheck className="w-3 h-3 text-blue-600" />
+                            {ord.cashier_name || 'Kasir'}
+                          </span>
+                        </td>
 
-                      {/* Kasir */}
-                      <td className="py-3.5 px-3 whitespace-nowrap text-slate-700">
-                        <span className="inline-flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md text-[11px] font-medium">
-                          <UserCheck className="w-3 h-3 text-blue-600" />
-                          {ord.cashier_name || 'Kasir'}
-                        </span>
-                      </td>
-
-                      {/* Menu Dipesan */}
-                      <td className="py-3.5 px-3 max-w-[200px]">
-                        <div
-                          className="truncate text-slate-600 text-[11px]"
-                          title={ord.items?.map((i) => `${i.menu_name} (${i.quantity})`).join(', ')}
-                        >
-                          {ord.items && ord.items.length > 0 ? (
-                            <span>
-                              {ord.items[0].menu_name} (x{ord.items[0].quantity})
-                              {ord.items.length > 1 && (
-                                <span className="text-slate-400">
-                                  {' '}
-                                  +{ord.items.length - 1} lainnya
+                        {/* Rincian Menu */}
+                        <td className="py-3.5 px-4 max-w-xs">
+                          <div className="space-y-0.5 text-[11px] text-slate-600 line-clamp-2">
+                            {ord.items && ord.items.length > 0 ? (
+                              ord.items.map((item, idx) => (
+                                <span key={idx} className="inline-block mr-2">
+                                  {item.quantity}x {item.menu_name}
+                                  {item.toppings && item.toppings.length > 0 && (
+                                    <span className="text-slate-400"> (+{item.toppings.length} top)</span>
+                                  )}
+                                  {idx < ord.items.length - 1 ? ',' : ''}
                                 </span>
-                              )}
-                            </span>
-                          ) : (
-                            <span className="text-slate-400">-</span>
-                          )}
-                        </div>
-                      </td>
+                              ))
+                            ) : (
+                              <span className="text-slate-400">-</span>
+                            )}
+                          </div>
+                        </td>
 
-                      {/* Metode Bayar */}
-                      <td className="py-3.5 px-3 uppercase font-semibold text-slate-700 whitespace-nowrap">
-                        <span className="inline-flex items-center gap-1">
-                          {ord.payment_method === 'cash' ? (
-                            <Banknote className="w-3.5 h-3.5 text-emerald-600" />
-                          ) : (
-                            <QrCode className="w-3.5 h-3.5 text-blue-600" />
-                          )}
-                          {ord.payment_method}
-                        </span>
-                      </td>
+                        {/* Metode */}
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          <span className="capitalize px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 inline-flex items-center gap-1">
+                            {ord.payment_method === 'cash' ? (
+                              <Banknote className="w-3.5 h-3.5 text-emerald-600" />
+                            ) : (
+                              <QrCode className="w-3.5 h-3.5 text-blue-600" />
+                            )}
+                            {ord.payment_method}
+                          </span>
+                        </td>
 
-                      {/* Total Bayar */}
-                      <td className="py-3.5 px-3 font-extrabold text-blue-600 whitespace-nowrap">
-                        {formatCurrency(ord.total_amount)}
-                      </td>
+                        {/* Total Tagihan */}
+                        <td className="py-3.5 px-4 font-extrabold text-blue-600 whitespace-nowrap text-right text-sm">
+                          {formatCurrency(ord.total_amount)}
+                        </td>
 
-                      {/* Status */}
-                      <td className="py-3.5 px-3 whitespace-nowrap">
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-                          {ord.status}
-                        </span>
-                      </td>
-
-                      {/* Aksi Struk */}
-                      <td className="py-3.5 px-3 text-center whitespace-nowrap">
-                        <button
-                          onClick={() => {
-                            setSelectedOrderForReceipt(ord);
-                            setIsReceiptOpen(true);
-                          }}
-                          className="px-2.5 py-1 rounded-lg text-[11px] font-semibold text-blue-600 hover:text-blue-800 hover:bg-blue-50 border border-blue-200 transition-colors inline-flex items-center gap-1"
-                          title="Lihat Struk Transaksi"
-                        >
-                          <Receipt className="w-3 h-3" />
-                          <span>Struk</span>
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                        {/* Aksi */}
+                        <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                          <button
+                            onClick={() => {
+                              setSelectedOrderForReceipt(ord);
+                              setIsReceiptOpen(true);
+                            }}
+                            className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs font-semibold inline-flex items-center gap-1.5 hover:border-blue-300"
+                            title="Lihat Struk Transaksi"
+                          >
+                            <Receipt className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Struk</span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 )}
               </tbody>
             </table>

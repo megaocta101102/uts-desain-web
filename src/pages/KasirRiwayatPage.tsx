@@ -9,7 +9,9 @@ import {
   QrCode,
   RefreshCw,
   Coffee,
-  UserCheck
+  UserCheck,
+  ArrowLeft,
+  ArrowUp
 } from 'lucide-react';
 import { Order } from '../types';
 import { db } from '../services/supabase';
@@ -59,6 +61,13 @@ export const KasirRiwayatPage: React.FC = () => {
       .filter((ord) => isToday(ord.created_at))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [orders]);
+
+  // Total Pendapatan harian saja (tanpa tambahan teks berlebih)
+  const todayTotalRevenue = useMemo(() => {
+    return todayOrders
+      .filter((ord) => ord.status !== 'dibatalkan')
+      .reduce((sum, ord) => sum + (Number(ord.total_amount) || 0), 0);
+  }, [todayOrders]);
 
   // Filter pencarian
   const filteredOrders = useMemo(() => {
@@ -124,32 +133,39 @@ export const KasirRiwayatPage: React.FC = () => {
             onClick={loadOrders}
             disabled={isLoading}
             className="clay-btn clay-btn-secondary !py-2.5 !px-3.5 text-xs font-semibold flex items-center gap-2"
-            title="Segarkan data transaksi"
+            title="Muat ulang data transaksi"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>Segarkan</span>
+            <span>Muat Ulang</span>
           </button>
           <Link
             to="/kasir"
-            className="clay-btn clay-btn-primary !py-2.5 !px-4 text-xs font-semibold flex items-center gap-2"
+            className="clay-btn clay-btn-primary !py-2.5 !px-4 text-xs font-semibold flex items-center gap-2 shadow-sm"
           >
-            <Coffee className="w-3.5 h-3.5" />
-            <span>Buka Kasir POS</span>
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Kembali</span>
           </Link>
         </div>
       </div>
 
-      {/* Pure Search Bar Only (Dropdown Tipe & Pembayaran Telah Dihapus) */}
+      {/* Pure Search Bar & Total Pendapatan Harian */}
       <div className="clay-card p-4 bg-white space-y-3">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Cari"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="clay-input !py-2.5 !pl-9 !pr-4 text-xs sm:text-sm w-full"
-          />
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Cari"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="clay-input !py-2.5 !pl-9 !pr-4 text-xs sm:text-sm w-full"
+            />
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+          </div>
+
+          <div className="shrink-0 px-4 py-2.5 rounded-2xl bg-blue-50 border border-blue-200/80 flex items-center gap-2 text-slate-700 shadow-xs">
+            <span className="text-xs font-semibold text-slate-600">Total Pendapatan:</span>
+            <span className="text-sm font-extrabold text-blue-700">{formatCurrency(todayTotalRevenue)}</span>
+          </div>
         </div>
 
         {/* Counter Results & Reset */}
@@ -312,6 +328,20 @@ export const KasirRiwayatPage: React.FC = () => {
             </table>
           </div>
         )}
+
+        {/* Footer Info & Back to Top Anchor */}
+        <div className="p-4 flex items-center justify-between border-t border-slate-100 text-xs text-slate-500">
+          <span>
+            Menampilkan <strong>{filteredOrders.length}</strong> transaksi (Hari Ini)
+          </span>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 underline underline-offset-4 font-semibold transition-colors py-1 cursor-pointer"
+          >
+            <ArrowUp className="w-3.5 h-3.5" />
+            <span>Kembali ke atas</span>
+          </button>
+        </div>
       </div>
 
       {/* Thermal Receipt Modal for Reprinting */}

@@ -109,10 +109,35 @@ export const KasirPOSPage: React.FC = () => {
     return subtotal + taxAmount;
   }, [subtotal, taxAmount]);
 
+  const parsePaidNumber = (val: string | number): number => {
+    if (typeof val === 'number') return val;
+    if (!val) return 0;
+    const clean = String(val).replace(/[^0-9]/g, '');
+    return Number(clean) || 0;
+  };
+
   const changeAmount = useMemo(() => {
-    const paid = Number(amountPaidInput) || 0;
+    const paid = parsePaidNumber(amountPaidInput);
     return Math.max(0, paid - totalAmount);
   }, [amountPaidInput, totalAmount]);
+
+  const quickCashPresets = useMemo(() => {
+    if (totalAmount <= 0) return [50000, 100000];
+    const presets: number[] = [];
+    
+    // Pembulatan ke 10.000 terdekat ke atas jika total bukan kelipatan 10k
+    const next10k = Math.ceil(totalAmount / 10000) * 10000;
+    if (next10k > totalAmount) presets.push(next10k);
+
+    // Pecahan umum Rupiah
+    [20000, 50000, 100000, 200000, 500000].forEach((denom) => {
+      if (denom > totalAmount && !presets.includes(denom)) {
+        presets.push(denom);
+      }
+    });
+
+    return presets.slice(0, 3);
+  }, [totalAmount]);
 
   // Handle Topping Selection in Modal
   const openToppingModal = (item: MenuItem) => {
@@ -195,11 +220,13 @@ export const KasirPOSPage: React.FC = () => {
   };
 
   const submitOrder = async () => {
-    const paid = paymentMethod === 'cash' ? Number(amountPaidInput) || totalAmount : totalAmount;
+    const rawPaid = parsePaidNumber(amountPaidInput);
+    const paid = paymentMethod === 'cash' ? (rawPaid || totalAmount) : totalAmount;
     if (paymentMethod === 'cash' && paid < totalAmount) {
       alert('Jumlah bayar tunai kurang dari total pesanan!');
       return;
     }
+    const change = paymentMethod === 'cash' ? Math.max(0, paid - totalAmount) : 0;
 
     const orderPayload: Partial<Order> = {
       customer_name: customerName.trim() || 'Tamu Meo Cafe',
@@ -219,7 +246,7 @@ export const KasirPOSPage: React.FC = () => {
       total_amount: totalAmount,
       payment_method: paymentMethod,
       amount_paid: paid,
-      change_amount: Math.max(0, paid - totalAmount),
+      change_amount: change,
       cashier_name: user?.name || 'Kasir',
       status: 'selesai',
     };
@@ -347,12 +374,12 @@ export const KasirPOSPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Order Cart & Bill (5 Cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <div className="clay-card p-5 bg-white border border-blue-100 flex flex-col sticky top-24">
+        {/* Right Column: Order Cart & Bill (5 Cols) - Tetap di tempat saat menu di scroll */}
+        <div className="lg:col-span-5 space-y-4 lg:sticky lg:top-20 self-start">
+          <div className="clay-card p-5 bg-white border border-blue-100 flex flex-col lg:max-h-[calc(100vh-6.5rem)] shadow-lg">
             
             {/* Header / Table / Order Type */}
-            <div className="border-b border-slate-100 pb-4 space-y-3">
+            <div className="border-b border-slate-100 pb-4 space-y-3 shrink-0">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <ShoppingCart className="w-5 h-5 text-blue-600" />
@@ -427,7 +454,7 @@ export const KasirPOSPage: React.FC = () => {
             </div>
 
             {/* Cart Items List */}
-            <div className="py-4 space-y-3 max-h-[360px] overflow-y-auto">
+            <div className="py-4 space-y-3 flex-1 overflow-y-auto max-h-[300px] lg:max-h-[calc(100vh-27rem)] overscroll-contain">
               {cart.length === 0 ? (
                 <div className="text-center py-10 text-slate-400 space-y-2">
                   <ShoppingCart className="w-10 h-10 mx-auto opacity-30" />
@@ -623,12 +650,6 @@ export const KasirPOSPage: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setToppingModalItem(null)}
-                  className="px-4 py-2 rounded-full text-slate-600 text-xs font-semibold hover:bg-slate-200/60"
-                >
-                  Batal
-                </button>
-                <button
                   onClick={addCustomizedItemToCart}
                   className="clay-btn clay-btn-primary !py-2 !px-4 text-xs"
                 >
@@ -712,24 +733,28 @@ export const KasirPOSPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setAmountPaidInput(totalAmount.toString())}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-semibold text-slate-700"
+                      className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                        parsePaidNumber(amountPaidInput) === totalAmount
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                          : 'bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border-slate-200 text-slate-700'
+                      }`}
                     >
                       Uang Pas ({formatCurrency(totalAmount)})
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setAmountPaidInput('50000')}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-semibold text-slate-700"
-                    >
-                      Rp 50.000
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAmountPaidInput('100000')}
-                      className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border border-slate-200 text-xs font-semibold text-slate-700"
-                    >
-                      Rp 100.000
-                    </button>
+                    {quickCashPresets.map((val) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setAmountPaidInput(val.toString())}
+                        className={`px-3 py-1.5 rounded-xl border text-xs font-semibold transition-all ${
+                          parsePaidNumber(amountPaidInput) === val
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                            : 'bg-slate-100 hover:bg-blue-50 hover:text-blue-700 border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {formatCurrency(val)}
+                      </button>
+                    ))}
                   </div>
 
                   {/* Change Preview */}

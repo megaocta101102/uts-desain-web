@@ -57,15 +57,17 @@ export const OwnerMenuPage: React.FC = () => {
     loadAll();
   }, []);
 
-  // Filter Menus
-  const filteredMenus = menus.filter((m) => {
-    const itemCat = normalizeMenuCategory(m.category, m.type);
-    const matchCat = categoryFilter === 'all' || itemCat === categoryFilter;
-    const matchSearch =
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (m.description && m.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchCat && matchSearch;
-  });
+  // Filter Menus - Menu terbaru diurutkan di bagian paling atas
+  const filteredMenus = [...menus]
+    .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+    .filter((m) => {
+      const itemCat = normalizeMenuCategory(m.category, m.type);
+      const matchCat = categoryFilter === 'all' || itemCat === categoryFilter;
+      const matchSearch =
+        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (m.description && m.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCat && matchSearch;
+    });
 
   // Open Menu Modal
   const handleOpenAddMenu = () => {
@@ -548,14 +550,7 @@ export const OwnerMenuPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsMenuModalOpen(false)}
-                  className="px-4 py-2 rounded-full text-slate-600 text-xs font-semibold hover:bg-slate-100"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end pt-3 border-t border-slate-100">
                 <button
                   type="submit"
                   className="clay-btn clay-btn-primary !py-2 !px-5 text-xs shadow-md"
@@ -633,14 +628,7 @@ export const OwnerMenuPage: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsToppingModalOpen(false)}
-                  className="px-4 py-2 rounded-full text-slate-600 text-xs font-semibold hover:bg-slate-100"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end pt-3 border-t border-slate-100">
                 <button
                   type="submit"
                   className="clay-btn clay-btn-primary !py-2 !px-5 text-xs shadow-md"

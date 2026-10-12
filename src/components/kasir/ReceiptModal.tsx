@@ -24,6 +24,12 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, isOpen, onClo
       })
     : new Date().toLocaleString('id-ID');
 
+  const amountPaid = Number(order.amount_paid) || Number(order.total_amount) || 0;
+  const totalAmount = Number(order.total_amount) || 0;
+  const changeAmount = (order.change_amount !== undefined && order.change_amount > 0)
+    ? order.change_amount
+    : (order.payment_method === 'cash' ? Math.max(0, amountPaid - totalAmount) : 0);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-blue-100 overflow-hidden flex flex-col max-h-[90vh]">
@@ -124,12 +130,14 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, isOpen, onClo
               </div>
               <div className="flex justify-between">
                 <span>Jumlah Bayar:</span>
-                <span>{formatCurrency(order.amount_paid)}</span>
+                <span>{formatCurrency(amountPaid)}</span>
               </div>
-              <div className="flex justify-between font-bold text-emerald-700">
-                <span>Kembalian:</span>
-                <span>{formatCurrency(order.change_amount)}</span>
-              </div>
+              {changeAmount > 0 && (
+                <div className="flex justify-between font-bold text-emerald-700">
+                  <span>Kembalian:</span>
+                  <span>{formatCurrency(changeAmount)}</span>
+                </div>
+              )}
             </div>
 
             {/* Customer Satisfaction QR */}
@@ -159,13 +167,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ order, isOpen, onClo
         </div>
 
         {/* Modal Actions */}
-        <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2.5 rounded-full text-slate-600 hover:bg-slate-100 font-semibold text-sm transition-colors"
-          >
-            Tutup
-          </button>
+        <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-end">
           <button
             onClick={handlePrint}
             className="clay-btn clay-btn-primary !py-2.5 !px-5 text-sm flex items-center gap-2"

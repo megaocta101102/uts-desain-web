@@ -121,7 +121,7 @@ export const OwnerKasirPage: React.FC = () => {
     setEditingUser(u);
     setUserForm({
       username: u?.username || '',
-      password: u?.password || '',
+      password: u?.role === 'owner' ? '' : (u?.password || ''),
       name: u?.name || u?.username || '',
       role: u?.role || 'kasir',
       status: (u?.status as 'aktif' | 'nonaktif') || 'aktif',
@@ -147,16 +147,22 @@ export const OwnerKasirPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userForm.username.trim() || !userForm.password.trim() || !userForm.name.trim()) {
-      setErrorMsg('Semua kolom wajib diisi!');
+    if (!userForm.username.trim() || !userForm.name.trim()) {
+      setErrorMsg('Nama dan username wajib diisi!');
+      return;
+    }
+
+    if (!editingUser && !userForm.password.trim()) {
+      setErrorMsg('Password wajib diisi!');
       return;
     }
 
     try {
       if (editingUser) {
+        const passwordToSave = userForm.password.trim() || editingUser.password;
         await db.updateUser(editingUser.id, {
           username: userForm.username.trim().toLowerCase(),
-          password: userForm.password.trim(),
+          password: passwordToSave,
           name: userForm.name.trim(),
           role: userForm.role,
           status: userForm.status,
@@ -650,19 +656,28 @@ export const OwnerKasirPage: React.FC = () => {
               {/* Password */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-600 block mb-1">
-                  Password Login *
+                  Password Login {userForm.role === 'owner' && editingUser ? '(Biarkan kosong jika tidak diganti)' : '*'}
                 </label>
                 <div className="relative">
                   <input
-                    type="text"
-                    required
-                    placeholder="Masukkan password login"
+                    type={userForm.role === 'owner' ? "password" : "text"}
+                    required={!editingUser}
+                    placeholder={
+                      userForm.role === 'owner'
+                        ? (editingUser ? '•••••••• (Dirahasiakan)' : 'Masukkan password rahasia owner')
+                        : 'Masukkan password login'
+                    }
                     value={userForm.password}
                     onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
                     className="clay-input !py-2 pl-3.5 pr-10 text-xs font-mono w-full"
                   />
                   <KeyRound className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 </div>
+                {userForm.role === 'owner' && (
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    🔒 Password akun Owner selalu disembunyikan/tidak terlihat demi menjaga privasi antar sesama owner.
+                  </p>
+                )}
               </div>
 
               {/* Status */}
@@ -682,14 +697,7 @@ export const OwnerKasirPage: React.FC = () => {
                 </select>
               </div>
 
-              <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-full text-slate-600 text-xs font-semibold hover:bg-slate-100"
-                >
-                  Batal
-                </button>
+              <div className="flex justify-end pt-4 border-t border-slate-100">
                 <button
                   type="submit"
                   className={

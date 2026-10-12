@@ -22,6 +22,8 @@ export const Navbar: React.FC = () => {
 
   const isOwnerArea = location.pathname.startsWith('/owner');
   const isKasirArea = location.pathname.startsWith('/kasir');
+  const isOwnerTransaksi = location.pathname === '/owner/transaksi';
+  const isKasirRiwayat = location.pathname === '/kasir/riwayat';
   const isLogin = location.pathname === '/login' || location.pathname === '/login.html';
 
   // Automatically close sidebar when route changes
@@ -58,7 +60,7 @@ export const Navbar: React.FC = () => {
           {/* Brand */}
           <div className="flex items-center gap-3">
             {/* Mobile Owner Sidebar Toggle Button (Hide / Show) */}
-            {isOwnerArea && (
+            {isOwnerArea && !isOwnerTransaksi && (
               <button
                 onClick={() => setIsMobileOwnerSidebarOpen(!isMobileOwnerSidebarOpen)}
                 className="md:hidden p-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition-all active:scale-95 flex items-center gap-1.5"
@@ -88,55 +90,59 @@ export const Navbar: React.FC = () => {
           {!isLogin && (
             <nav className="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-full border border-slate-200/60">
               {isOwnerArea ? (
-                <>
-                  <Link
-                    to="/owner/statistik"
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                      location.pathname === '/owner/statistik'
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    <LayoutDashboard className="w-4 h-4" />
-                    Statistik
-                  </Link>
-                  <Link
-                    to="/owner/menu"
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                      location.pathname === '/owner/menu'
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    <Utensils className="w-4 h-4" />
-                    Kelola Menu
-                  </Link>
-                  <Link
-                    to="/owner/kasir"
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
-                      location.pathname === '/owner/kasir'
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    <Users className="w-4 h-4" />
-                    Kontrol Akun
-                  </Link>
-                </>
+                !isOwnerTransaksi ? (
+                  <>
+                    <Link
+                      to="/owner/statistik"
+                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                        location.pathname === '/owner/statistik'
+                          ? 'bg-white text-blue-600 shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      Statistik
+                    </Link>
+                    <Link
+                      to="/owner/menu"
+                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                        location.pathname === '/owner/menu'
+                          ? 'bg-white text-blue-600 shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Utensils className="w-4 h-4" />
+                      Kelola Menu
+                    </Link>
+                    <Link
+                      to="/owner/kasir"
+                      className={`px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center gap-2 ${
+                        location.pathname === '/owner/kasir'
+                          ? 'bg-white text-blue-600 shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Users className="w-4 h-4" />
+                      Kontrol Akun
+                    </Link>
+                  </>
+                ) : null
               ) : isKasirArea ? (
-                <>
-                  <Link
-                    to="/kasir"
-                    className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 ${
-                      location.pathname === '/kasir'
-                        ? 'bg-white text-blue-600 shadow-sm'
-                        : 'text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    <Utensils className="w-3.5 h-3.5" />
-                    <span>Kasir POS</span>
-                  </Link>
-                </>
+                !isKasirRiwayat ? (
+                  <>
+                    <Link
+                      to="/kasir"
+                      className={`px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                        location.pathname === '/kasir'
+                          ? 'bg-white text-blue-600 shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Utensils className="w-3.5 h-3.5" />
+                      <span>Kasir POS</span>
+                    </Link>
+                  </>
+                ) : null
               ) : (
                 <>
                   <Link
