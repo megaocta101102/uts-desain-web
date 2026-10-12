@@ -675,7 +675,7 @@ export const OwnerKasirPage: React.FC = () => {
                 </div>
                 {userForm.role === 'owner' && (
                   <p className="text-[11px] text-slate-400 mt-1">
-                    🔒 Password akun Owner selalu disembunyikan/tidak terlihat demi menjaga privasi antar sesama owner.
+                    🔒 Password akun Owner disembunyikan
                   </p>
                 )}
               </div>
