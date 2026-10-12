@@ -463,7 +463,7 @@ export const OwnerStatistikPage: React.FC = () => {
               Daftar Riwayat Transaksi Kasir
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Pemeriksaan pembukuan order pelanggan secara detail dan unduh laporan CSV
+              Rekapitulasi pesanan pelanggan secara terperinci.
             </p>
           </div>
         </div>
