@@ -123,14 +123,6 @@ export const OwnerStatistikPage: React.FC = () => {
     return totalOrdersCount > 0 ? Math.round(totalRevenue / totalOrdersCount) : 0;
   }, [totalRevenue, totalOrdersCount]);
 
-  // Metric Today
-  const todayRevenue = useMemo(() => {
-    const now = new Date();
-    return orders
-      .filter((o) => o.status !== 'dibatalkan' && o.created_at && isSameDay(new Date(o.created_at), now))
-      .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
-  }, [orders]);
-
   // Payment Breakdown
   const paymentBreakdown = useMemo(() => {
     let cash = 0;
@@ -271,21 +263,21 @@ export const OwnerStatistikPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Bento KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Bento KPI Grid - 3 Kotak Seimbang & Estetis */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6">
         
-        {/* Card 1: Total Omzet Terfilter */}
-        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-blue-600">
+        {/* Card 1: Total Pendapatan */}
+        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-blue-600 shadow-sm transition-all hover:shadow-md">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Total Pendapatan
             </span>
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
               <DollarSign className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight" title={formatCurrency(totalRevenue)}>
               {formatCurrency(totalRevenue)}
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
@@ -294,38 +286,18 @@ export const OwnerStatistikPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 2: Omzet Hari Ini */}
-        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-emerald-500">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Pendapatan Hari Ini
-            </span>
-            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Calendar className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="mt-4">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-emerald-700">
-              {formatCurrency(todayRevenue)}
-            </h3>
-            <span className="text-xs text-slate-500 mt-1 block">
-              Penjualan realtime kasir
-            </span>
-          </div>
-        </div>
-
-        {/* Card 3: Total Transaksi */}
-        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-indigo-600">
+        {/* Card 2: Total Transaksi */}
+        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-indigo-600 shadow-sm transition-all hover:shadow-md">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Total Transaksi
             </span>
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
               <ShoppingBag className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               {totalOrdersCount} <span className="text-sm font-normal text-slate-500">pesanan</span>
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
@@ -334,18 +306,18 @@ export const OwnerStatistikPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Card 4: Rata-Rata Transaksi */}
-        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-amber-500">
+        {/* Card 3: Rata-Rata Order */}
+        <div className="clay-card p-6 bg-white flex flex-col justify-between border-l-4 border-l-amber-500 shadow-sm transition-all hover:shadow-md">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
               Rata-rata Order
             </span>
-            <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
               <TrendingUp className="w-5 h-5" />
             </div>
           </div>
           <div className="mt-4">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+            <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight" title={formatCurrency(avgOrderValue)}>
               {formatCurrency(avgOrderValue)}
             </h3>
             <span className="text-xs text-slate-500 mt-1 block">
