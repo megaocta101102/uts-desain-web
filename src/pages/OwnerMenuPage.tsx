@@ -85,12 +85,16 @@ export const OwnerMenuPage: React.FC = () => {
 
   const handleOpenEditMenu = (item: MenuItem) => {
     setEditingMenu(item);
+    let img = item.image_url || '';
+    if (item.category === 'makanan' && (img.includes('hero_cafe') || !img)) {
+      img = '/assets/images/makanan_berat.jpg';
+    }
     setMenuForm({
       name: item.name,
       category: item.category,
       price: item.price.toString(),
       description: item.description || '',
-      image_url: item.image_url || '/assets/images/coffee_signature.jpg',
+      image_url: img || (item.category === 'makanan' ? '/assets/images/makanan_berat.jpg' : '/assets/images/coffee_signature.jpg'),
       status: item.status,
     });
     setIsMenuModalOpen(true);
@@ -103,12 +107,19 @@ export const OwnerMenuPage: React.FC = () => {
       return;
     }
 
+    const defaultImg =
+      menuForm.category === 'makanan'
+        ? '/assets/images/makanan_berat.jpg'
+        : menuForm.category === 'snack'
+        ? '/assets/images/dessert_pastry.jpg'
+        : '/assets/images/coffee_signature.jpg';
+
     const payload: Partial<MenuItem> = {
       name: menuForm.name.trim(),
       category: menuForm.category,
       price: Number(menuForm.price),
       description: menuForm.description.trim(),
-      image_url: menuForm.image_url.trim() || '/assets/images/coffee_signature.jpg',
+      image_url: menuForm.image_url.trim() || defaultImg,
       status: menuForm.status,
     };
 
@@ -291,7 +302,8 @@ export const OwnerMenuPage: React.FC = () => {
                       alt={item.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/images/coffee_signature.jpg';
+                        const target = e.target as HTMLImageElement;
+                        target.src = item.category === 'makanan' ? '/assets/images/makanan_berat.jpg' : (item.category === 'snack' ? '/assets/images/dessert_pastry.jpg' : '/assets/images/coffee_signature.jpg');
                       }}
                     />
                     <div className="absolute top-2.5 left-2.5">
@@ -444,12 +456,26 @@ export const OwnerMenuPage: React.FC = () => {
                   </label>
                   <select
                     value={menuForm.category}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const newCat = e.target.value as 'minuman' | 'makanan' | 'snack';
+                      const isDefaultImg =
+                        !menuForm.image_url ||
+                        menuForm.image_url.includes('coffee_signature') ||
+                        menuForm.image_url.includes('makanan_berat') ||
+                        menuForm.image_url.includes('dessert_pastry') ||
+                        menuForm.image_url.includes('hero_cafe');
+                      const autoImg =
+                        newCat === 'makanan'
+                          ? '/assets/images/makanan_berat.jpg'
+                          : newCat === 'snack'
+                          ? '/assets/images/dessert_pastry.jpg'
+                          : '/assets/images/coffee_signature.jpg';
                       setMenuForm({
                         ...menuForm,
-                        category: e.target.value as 'minuman' | 'makanan' | 'snack',
-                      })
-                    }
+                        category: newCat,
+                        image_url: isDefaultImg ? autoImg : menuForm.image_url,
+                      });
+                    }}
                     className="clay-input !py-2 text-xs"
                   >
                     <option value="minuman">Minuman (Coffee/Mocktail)</option>
@@ -479,32 +505,39 @@ export const OwnerMenuPage: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  placeholder="/assets/images/coffee_signature.jpg atau URL Web"
+                  placeholder="/assets/images/makanan_berat.jpg atau URL Web"
                   value={menuForm.image_url}
                   onChange={(e) => setMenuForm({ ...menuForm, image_url: e.target.value })}
                   className="clay-input !py-2 text-xs"
                 />
-                <div className="flex gap-2 mt-1.5">
+                <div className="flex flex-wrap gap-1.5 mt-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setMenuForm({ ...menuForm, image_url: '/assets/images/makanan_berat.jpg' })}
+                    className="text-[10px] px-2.5 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold border border-blue-200"
+                  >
+                    🍛 Preset Makanan Berat
+                  </button>
                   <button
                     type="button"
                     onClick={() => setMenuForm({ ...menuForm, image_url: '/assets/images/coffee_signature.jpg' })}
                     className="text-[10px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600"
                   >
-                    Preset Kopi
+                    ☕ Preset Kopi
                   </button>
                   <button
                     type="button"
                     onClick={() => setMenuForm({ ...menuForm, image_url: '/assets/images/mocktail_ocean.jpg' })}
                     className="text-[10px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600"
                   >
-                    Preset Mocktail
+                    🍹 Preset Mocktail
                   </button>
                   <button
                     type="button"
                     onClick={() => setMenuForm({ ...menuForm, image_url: '/assets/images/dessert_pastry.jpg' })}
                     className="text-[10px] px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600"
                   >
-                    Preset Pastry
+                    🥐 Preset Pastry/Snack
                   </button>
                 </div>
               </div>

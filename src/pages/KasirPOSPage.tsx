@@ -347,7 +347,8 @@ export const KasirPOSPage: React.FC = () => {
                       alt={item.name}
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = '/assets/images/coffee_signature.jpg';
+                        const target = e.target as HTMLImageElement;
+                        target.src = item.category === 'makanan' ? '/assets/images/makanan_berat.jpg' : (item.category === 'snack' ? '/assets/images/dessert_pastry.jpg' : '/assets/images/coffee_signature.jpg');
                       }}
                     />
                     {item.status === 'habis' && (

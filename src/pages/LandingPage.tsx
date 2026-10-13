@@ -193,6 +193,10 @@ export const LandingPage: React.FC = () => {
                       alt={menu.name}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = menu.category === 'makanan' ? '/assets/images/makanan_berat.jpg' : (menu.category === 'snack' ? '/assets/images/dessert_pastry.jpg' : '/assets/images/coffee_signature.jpg');
+                      }}
                     />
                     <div className="absolute top-3 left-3">
                       <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-800 font-bold text-xs shadow-sm uppercase">

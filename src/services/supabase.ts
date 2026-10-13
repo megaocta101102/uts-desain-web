@@ -69,7 +69,7 @@ export const INITIAL_MENUS: MenuItem[] = [
     category: 'makanan',
     price: 38000,
     description: 'Croissant renyah dengan isian daging sapi asap premium, keju cheddar meleleh, dan saus tartar.',
-    image_url: '/assets/images/dessert_pastry.jpg',
+    image_url: '/assets/images/makanan_berat.jpg',
     status: 'tersedia',
   },
   {
@@ -380,10 +380,14 @@ class DatabaseService {
             const sanitized: MenuItem[] = data.map((m: any) => {
               const primaryCat = normalizeMenuCategory(m.category, m.type);
               const subCat = m.category && m.category.toLowerCase() !== primaryCat ? m.category : '';
-              const rawImg = m.image_url || '';
+              let rawImg = m.image_url || '';
+              // Jika menu kategori makanan dan memakai gambar profil cafe atau kosong, ganti ke makanan berat
+              if (primaryCat === 'makanan' && (rawImg.includes('hero_cafe') || !rawImg)) {
+                rawImg = '/assets/images/makanan_berat.jpg';
+              }
               const formattedImg = rawImg
                 ? (rawImg.startsWith('http') || rawImg.startsWith('/') ? rawImg : `/${rawImg}`)
-                : '/assets/images/coffee_signature.jpg';
+                : (primaryCat === 'makanan' ? '/assets/images/makanan_berat.jpg' : '/assets/images/coffee_signature.jpg');
 
               return {
                 id: m.id || `m-${Date.now()}`,
@@ -411,11 +415,19 @@ class DatabaseService {
       try {
         const parsed = JSON.parse(local);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((m: any) => ({
-            ...m,
-            category: normalizeMenuCategory(m.category, m.type),
-            subCategory: m.subCategory || (m.category && m.category !== normalizeMenuCategory(m.category, m.type) ? m.category : ''),
-          }));
+          return parsed.map((m: any) => {
+            const primaryCat = normalizeMenuCategory(m.category, m.type);
+            let img = m.image_url || '';
+            if (primaryCat === 'makanan' && (img.includes('hero_cafe') || !img)) {
+              img = '/assets/images/makanan_berat.jpg';
+            }
+            return {
+              ...m,
+              category: primaryCat,
+              image_url: img || (primaryCat === 'makanan' ? '/assets/images/makanan_berat.jpg' : '/assets/images/coffee_signature.jpg'),
+              subCategory: m.subCategory || (m.category && m.category !== primaryCat ? m.category : ''),
+            };
+          });
         }
       } catch {}
     }
@@ -424,13 +436,15 @@ class DatabaseService {
 
   async saveMenu(item: Partial<MenuItem>): Promise<MenuItem> {
     await this.init();
+    const cat = item.category || 'minuman';
+    const defaultImg = cat === 'makanan' ? '/assets/images/makanan_berat.jpg' : (cat === 'snack' ? '/assets/images/dessert_pastry.jpg' : '/assets/images/coffee_signature.jpg');
     const newItem: MenuItem = {
       id: item.id || `m-${Date.now()}`,
       name: item.name || '',
-      category: item.category || 'minuman',
+      category: cat,
       price: Number(item.price) || 0,
       description: item.description || '',
-      image_url: item.image_url || '/assets/images/coffee_signature.jpg',
+      image_url: item.image_url || defaultImg,
       status: item.status || 'tersedia',
       created_at: new Date().toISOString(),
     };
