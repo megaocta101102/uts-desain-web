@@ -10,10 +10,15 @@ const LandingPage = lazy(() => import('./pages/LandingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const KasirPOSPage = lazy(() => import('./pages/KasirPOSPage'));
 const KasirRiwayatPage = lazy(() => import('./pages/KasirRiwayatPage'));
+const KasirJadwalPage = lazy(() => import('./pages/KasirJadwalPage'));
 const OwnerStatistikPage = lazy(() => import('./pages/OwnerStatistikPage'));
 const OwnerTransaksiPage = lazy(() => import('./pages/OwnerTransaksiPage'));
 const OwnerMenuPage = lazy(() => import('./pages/OwnerMenuPage'));
+const OwnerKeuanganPage = lazy(() => import('./pages/OwnerKeuanganPage'));
+const OwnerStokPage = lazy(() => import('./pages/OwnerStokPage'));
+const OwnerRiwayatArusKasPage = lazy(() => import('./pages/OwnerRiwayatArusKasPage'));
 const OwnerKasirPage = lazy(() => import('./pages/OwnerKasirPage'));
+const OwnerJadwalPage = lazy(() => import('./pages/OwnerJadwalPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // Protected Route Guards
@@ -85,6 +90,17 @@ const AppContent: React.FC = () => {
             />
             <Route path="/kasir-riwayat.html" element={<Navigate to="/kasir/riwayat" replace />} />
 
+            {/* Jadwal Shift Kasir */}
+            <Route
+              path="/kasir/jadwal"
+              element={
+                <ProtectedKasirRoute>
+                  <KasirJadwalPage />
+                </ProtectedKasirRoute>
+              }
+            />
+            <Route path="/kasir-jadwal.html" element={<Navigate to="/kasir/jadwal" replace />} />
+
             {/* Owner Portal */}
             <Route path="/owner" element={<Navigate to="/owner/statistik" replace />} />
             <Route path="/owner.html" element={<Navigate to="/owner/statistik" replace />} />
@@ -98,6 +114,34 @@ const AppContent: React.FC = () => {
               }
             />
             <Route path="/owner-statistik.html" element={<Navigate to="/owner/statistik" replace />} />
+
+            <Route
+              path="/owner/keuangan"
+              element={
+                <ProtectedOwnerRoute>
+                  <OwnerKeuanganPage />
+                </ProtectedOwnerRoute>
+              }
+            />
+            <Route path="/owner-keuangan.html" element={<Navigate to="/owner/keuangan" replace />} />
+
+            <Route
+              path="/owner/stok"
+              element={
+                <ProtectedOwnerRoute>
+                  <OwnerStokPage />
+                </ProtectedOwnerRoute>
+              }
+            />
+
+            <Route
+              path="/owner/keuangan/riwayat"
+              element={
+                <ProtectedOwnerRoute>
+                  <OwnerRiwayatArusKasPage />
+                </ProtectedOwnerRoute>
+              }
+            />
 
             <Route
               path="/owner/transaksi"
@@ -128,6 +172,16 @@ const AppContent: React.FC = () => {
               }
             />
             <Route path="/owner-kasir.html" element={<Navigate to="/owner/kasir" replace />} />
+
+            <Route
+              path="/owner/jadwal"
+              element={
+                <ProtectedOwnerRoute>
+                  <OwnerJadwalPage />
+                </ProtectedOwnerRoute>
+              }
+            />
+            <Route path="/owner-jadwal.html" element={<Navigate to="/owner/jadwal" replace />} />
 
             {/* 404 Fallback */}
             <Route path="*" element={<NotFoundPage />} />

@@ -14,7 +14,8 @@ import {
   CheckCircle2,
   Clock,
   History,
-  AlertCircle
+  AlertCircle,
+  Calendar
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping, CartItem, SelectedTopping, OrderType, PaymentMethod, Order } from '../types';
 import { db, normalizeMenuCategory } from '../services/supabase';
@@ -281,7 +282,7 @@ export const KasirPOSPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowHistory(true)}
-            className="clay-btn clay-btn-secondary !py-2.5 !px-4 text-xs font-semibold flex items-center gap-2"
+            className="clay-btn clay-btn-secondary !py-2.5 !px-4 text-xs font-semibold flex items-center gap-2 cursor-pointer"
           >
             <History className="w-4 h-4 text-blue-600" />
             <span>Riwayat Transaksi</span>

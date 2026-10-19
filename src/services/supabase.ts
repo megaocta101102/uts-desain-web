@@ -90,6 +90,8 @@ export const INITIAL_TOPPINGS: Topping[] = [
   { id: 't-4', name: 'Salted Caramel Drizzle', price: 4000, category: 'all', status: 'tersedia' },
   { id: 't-5', name: 'Whipped Cream Velvety', price: 5000, category: 'minuman', status: 'tersedia' },
   { id: 't-6', name: 'Melted Cheddar Cheese', price: 7000, category: 'makanan', status: 'tersedia' },
+  { id: 't-7', name: 'Vanilla Ice Cream Scoop', price: 6000, category: 'all', status: 'tersedia' },
+  { id: 't-8', name: 'Roasted Almond Flakes', price: 5000, category: 'all', status: 'tersedia' },
 ];
 
 export const INITIAL_USERS: User[] = [
@@ -103,10 +105,37 @@ export const INITIAL_USERS: User[] = [
     created_at: new Date().toISOString(),
   },
   {
-    id: 'usr-kasir-1',
-    username: 'kasir',
-    password: 'kasir123',
-    name: 'Kasir Utama',
+    id: 'usr-kasir-cindy',
+    username: 'cindy',
+    password: 'cindy123',
+    name: 'Cindy',
+    role: 'kasir',
+    status: 'aktif',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'usr-kasir-lulu',
+    username: 'lulu',
+    password: 'lulu123',
+    name: 'Lulu',
+    role: 'kasir',
+    status: 'aktif',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'usr-kasir-byeon',
+    username: 'byeon',
+    password: 'byeon123',
+    name: 'Byeon Woo Seok',
+    role: 'kasir',
+    status: 'aktif',
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 'usr-kasir-sera',
+    username: 'sera',
+    password: 'sera123',
+    name: 'Sera',
     role: 'kasir',
     status: 'aktif',
     created_at: new Date().toISOString(),
@@ -218,8 +247,25 @@ class DatabaseService {
   }
 
   // ================= USERS =================
+  // ================= USERS =================
   async getUsers(): Promise<User[]> {
     await this.init();
+
+    // Map status dari localStorage agar status yang diubah (misal 'nonaktif') tidak ter-reset
+    const local = localStorage.getItem(STORAGE_KEYS.USERS);
+    const localStatusMap: Record<string, 'aktif' | 'nonaktif'> = {};
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed)) {
+          parsed.forEach((u: any) => {
+            if (u.id && u.status) localStatusMap[u.id] = u.status;
+            if (u.username && u.status) localStatusMap[u.username.toLowerCase()] = u.status;
+          });
+        }
+      } catch {}
+    }
+
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?select=*&order=created_at.desc`, {
@@ -228,15 +274,21 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            const sanitized: User[] = data.map((u: any) => ({
-              id: u.id || `usr-${Date.now()}`,
-              name: u.full_name || u.name || u.username || 'Kasir',
-              username: u.username || 'kasir',
-              password: u.password || '',
-              role: (u.role || 'kasir') as 'owner' | 'kasir',
-              status: u.status || 'aktif',
-              created_at: u.created_at || new Date().toISOString(),
-            }));
+            const sanitized: User[] = data.map((u: any) => {
+              const uname = (u.username || 'kasir').toLowerCase();
+              const localStatus = localStatusMap[u.id] || localStatusMap[uname];
+              const resolvedStatus = localStatus || u.status || 'aktif';
+
+              return {
+                id: u.id || `usr-${Date.now()}`,
+                name: u.full_name || u.name || u.username || 'Kasir',
+                username: u.username || 'kasir',
+                password: u.password || '',
+                role: (u.role || 'kasir') as 'owner' | 'kasir',
+                status: resolvedStatus as 'aktif' | 'nonaktif',
+                created_at: u.created_at || new Date().toISOString(),
+              };
+            });
             localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(sanitized));
             return sanitized;
           }
@@ -245,17 +297,30 @@ class DatabaseService {
         console.warn('Supabase fetch users failed, fallback to local', err);
       }
     }
-    const local = localStorage.getItem(STORAGE_KEYS.USERS);
-    const parsed = local ? JSON.parse(local) : INITIAL_USERS;
-    return (Array.isArray(parsed) ? parsed : INITIAL_USERS).map((u: any) => ({
+
+    let parsed: any[] = local ? JSON.parse(local) : INITIAL_USERS;
+    if (!Array.isArray(parsed) || parsed.length === 0) {
+      parsed = [...INITIAL_USERS];
+    } else {
+      INITIAL_USERS.forEach((initU) => {
+        if (!parsed.some((p) => p.username === initU.username || p.id === initU.id)) {
+          parsed.push(initU);
+        }
+      });
+    }
+    const mapped = parsed.map((u: any) => ({
       id: u.id || `usr-${Date.now()}`,
       name: u.full_name || u.name || u.username || 'Kasir',
       username: u.username || 'kasir',
       password: u.password || '',
       role: (u.role || 'kasir') as 'owner' | 'kasir',
-      status: u.status || 'aktif',
+      status: (u.status || 'aktif') as 'aktif' | 'nonaktif',
       created_at: u.created_at || new Date().toISOString(),
     }));
+    try {
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(mapped));
+    } catch {}
+    return mapped;
   }
 
   async insertUser(user: Partial<User>): Promise<User> {
@@ -299,14 +364,63 @@ class DatabaseService {
       }
     }
 
-    const current = await this.getUsers();
+    const local = localStorage.getItem(STORAGE_KEYS.USERS);
+    let current: User[] = [];
+    if (local) {
+      try {
+        const p = JSON.parse(local);
+        if (Array.isArray(p)) current = p;
+      } catch {}
+    }
+    if (current.length === 0) {
+      current = await this.getUsers();
+    }
     const updated = [newUser, ...current.filter((u) => u.username !== newUser.username && u.id !== newUser.id)];
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updated));
+    window.dispatchEvent(new Event('meo_cafe_users_updated'));
     return newUser;
   }
 
   async updateUser(id: string, user: Partial<User>): Promise<User | null> {
     await this.init();
+
+    // 1. Ambil data lokal saat ini
+    const local = localStorage.getItem(STORAGE_KEYS.USERS);
+    let current: User[] = [];
+    if (local) {
+      try {
+        const p = JSON.parse(local);
+        if (Array.isArray(p)) current = p;
+      } catch {}
+    }
+    if (current.length === 0) {
+      current = await this.getUsers();
+    }
+
+    const cleanUsername = user.username?.trim().toLowerCase();
+    let updatedUser: User | null = null;
+
+    const updatedList = current.map((u) => {
+      const matchId = u.id === id;
+      const matchUsername = cleanUsername ? u.username.toLowerCase() === cleanUsername : false;
+
+      if (matchId || matchUsername) {
+        updatedUser = {
+          ...u,
+          ...user,
+          name: user.name || (user as any).full_name || u.name,
+          username: user.username?.trim().toLowerCase() || u.username,
+          status: user.status !== undefined ? user.status : (u.status || 'aktif'),
+        };
+        return updatedUser;
+      }
+      return u;
+    });
+
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updatedList));
+    window.dispatchEvent(new Event('meo_cafe_users_updated'));
+
+    // 2. Sync ke Supabase bila terhubung
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
         const payload: Record<string, any> = {};
@@ -316,9 +430,15 @@ class DatabaseService {
           payload.full_name = (user.name || (user as any).full_name).trim();
         }
         if (user.role) payload.role = user.role;
+        if (user.status) payload.status = user.status;
 
-        // If id is uuid, update by id, else by username
-        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `username=eq.${user.username}`;
+        const target = current.find((u) => u.id === id || (cleanUsername && u.username.toLowerCase() === cleanUsername));
+        const query = (id && id.length === 36 && id.includes('-'))
+          ? `id=eq.${id}`
+          : target?.id && target.id.length === 36 && target.id.includes('-')
+          ? `id=eq.${target.id}`
+          : `username=eq.${cleanUsername || target?.username || id}`;
+
         await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?${query}`, {
           method: 'PATCH',
           headers: this.getHeaders(),
@@ -329,28 +449,36 @@ class DatabaseService {
       }
     }
 
-    const current = await this.getUsers();
-    let updatedUser: User | null = null;
-    const updatedList = current.map((u) => {
-      if (u.id === id || u.username === user.username) {
-        updatedUser = {
-          ...u,
-          ...user,
-          name: user.name || (user as any).full_name || u.name,
-        };
-        return updatedUser;
-      }
-      return u;
-    });
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updatedList));
     return updatedUser;
   }
 
   async deleteUser(id: string): Promise<boolean> {
     await this.init();
+    const local = localStorage.getItem(STORAGE_KEYS.USERS);
+    let current: User[] = [];
+    if (local) {
+      try {
+        const p = JSON.parse(local);
+        if (Array.isArray(p)) current = p;
+      } catch {}
+    }
+    if (current.length === 0) {
+      current = await this.getUsers();
+    }
+
+    const target = current.find((u) => u.id === id || u.username === id);
+    const updated = current.filter((u) => u.id !== id && u.username !== id);
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updated));
+    window.dispatchEvent(new Event('meo_cafe_users_updated'));
+
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        const query = id.length === 36 && id.includes('-') ? `id=eq.${id}` : `username=eq.${id}`;
+        const query = (id && id.length === 36 && id.includes('-'))
+          ? `id=eq.${id}`
+          : target?.id && target.id.length === 36 && target.id.includes('-')
+          ? `id=eq.${target.id}`
+          : `username=eq.${target?.username || id}`;
+
         await fetch(`${this.config.SUPABASE_URL}/rest/v1/users?${query}`, {
           method: 'DELETE',
           headers: this.getHeaders(),
@@ -359,10 +487,6 @@ class DatabaseService {
         console.warn('Supabase delete user failed, deleted locally', err);
       }
     }
-
-    const current = await this.getUsers();
-    const updated = current.filter((u) => u.id !== id && u.username !== id);
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(updated));
     return true;
   }
 
@@ -635,68 +759,124 @@ class DatabaseService {
     await this.init();
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
-        const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc`, {
-          headers: this.getHeaders(),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            const sanitized: Order[] = data.map((o: any) => {
-              let extraMeta: any = {};
-              if (o.notes) {
-                try {
-                  extraMeta = typeof o.notes === 'string' && o.notes.startsWith('{') ? JSON.parse(o.notes) : {};
-                } catch {
-                  extraMeta = {};
-                }
-              }
+        let allData: any[] = [];
+        let offset = 0;
+        const pageSize = 1000;
+        let hasMore = true;
 
-              const totalAmount = Number(o.total_amount) || 0;
-              const paymentMethod = o.payment_method || 'cash';
-              const rawPaid = o.amount_paid ?? extraMeta.amount_paid;
-              const amountPaid = rawPaid !== undefined && rawPaid !== null ? Number(rawPaid) : totalAmount;
-              
-              let changeAmount = Number(o.change_amount ?? extraMeta.change_amount ?? 0);
-              if (changeAmount <= 0 && paymentMethod === 'cash' && amountPaid > totalAmount) {
-                changeAmount = Math.max(0, amountPaid - totalAmount);
+        while (hasMore) {
+          const res = await fetch(
+            `${this.config.SUPABASE_URL}/rest/v1/orders?select=*&order=created_at.desc&offset=${offset}&limit=${pageSize}`,
+            { headers: this.getHeaders() }
+          );
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              allData = allData.concat(data);
+              if (data.length < pageSize) {
+                hasMore = false;
+              } else {
+                offset += pageSize;
               }
-
-              let itemsList = Array.isArray(o.items) && o.items.length > 0 ? o.items : (Array.isArray(extraMeta.items) && extraMeta.items.length > 0 ? extraMeta.items : []);
-              if (itemsList.length === 0 && totalAmount > 0) {
-                itemsList = [
-                  {
-                    menu_id: 'default-item',
-                    menu_name: 'Signature Latte & Bites',
-                    price: Math.round(totalAmount / 1.1),
-                    quantity: 1,
-                    toppings: [],
-                    subtotal: Math.round(totalAmount / 1.1),
-                  }
-                ];
-              }
-
-              return {
-                id: o.id || `ord-${Date.now()}`,
-                order_number: o.order_number || `MEO-${Date.now().toString().slice(-6)}`,
-                customer_name: o.customer_name || 'Pelanggan',
-                order_type: o.order_type || 'dine_in',
-                table_number: o.table_number || '-',
-                items: itemsList,
-                subtotal: Number(o.subtotal) || 0,
-                tax_amount: Number(o.tax || o.tax_amount) || 0,
-                service_amount: Number(o.service_amount) || 0,
-                total_amount: totalAmount,
-                payment_method: paymentMethod,
-                amount_paid: amountPaid,
-                change_amount: changeAmount,
-                cashier_name: o.cashier_name || 'Kasir',
-                status: o.payment_status === 'cancelled' ? 'dibatalkan' : (o.status || 'selesai'),
-                created_at: o.created_at || new Date().toISOString(),
-              };
-            });
-            localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(sanitized));
-            return sanitized;
+            } else {
+              hasMore = false;
+            }
+          } else {
+            hasMore = false;
           }
+        }
+
+        if (allData.length > 0) {
+          const sanitized: Order[] = allData.map((o: any) => {
+            let extraMeta: any = {};
+            if (o.notes) {
+              try {
+                extraMeta = typeof o.notes === 'string' && o.notes.startsWith('{') ? JSON.parse(o.notes) : {};
+              } catch {
+                extraMeta = {};
+              }
+            }
+
+            const totalAmount = Number(o.total_amount) || 0;
+            const paymentMethod = o.payment_method || 'cash';
+            const rawPaid = o.amount_paid ?? extraMeta.amount_paid;
+            const amountPaid = rawPaid !== undefined && rawPaid !== null ? Number(rawPaid) : totalAmount;
+            
+            let changeAmount = Number(o.change_amount ?? extraMeta.change_amount ?? 0);
+            if (changeAmount <= 0 && paymentMethod === 'cash' && amountPaid > totalAmount) {
+              changeAmount = Math.max(0, amountPaid - totalAmount);
+            }
+
+            let itemsList = Array.isArray(o.items) && o.items.length > 0 ? o.items : (Array.isArray(extraMeta.items) && extraMeta.items.length > 0 ? extraMeta.items : []);
+            if (itemsList.length === 0 && totalAmount > 0) {
+              itemsList = [
+                {
+                  menu_id: 'default-item',
+                  menu_name: 'Signature Latte & Bites',
+                  price: Math.round(totalAmount / 1.1),
+                  quantity: 1,
+                  toppings: [],
+                  subtotal: Math.round(totalAmount / 1.1),
+                }
+              ];
+            }
+
+            return {
+              id: o.id || `ord-${Date.now()}`,
+              order_number: o.order_number || `MEO-${Date.now().toString().slice(-6)}`,
+              customer_name: o.customer_name || 'Pelanggan',
+              order_type: o.order_type || 'dine_in',
+              table_number: o.table_number || '-',
+              items: itemsList,
+              subtotal: Number(o.subtotal) || 0,
+              tax_amount: Number(o.tax || o.tax_amount) || 0,
+              service_amount: Number(o.service_amount) || 0,
+              total_amount: totalAmount,
+              payment_method: paymentMethod,
+              amount_paid: amountPaid,
+              change_amount: changeAmount,
+              cashier_name: o.cashier_name || 'Kasir',
+              status: o.payment_status === 'cancelled' ? 'dibatalkan' : (o.status || 'selesai'),
+              created_at: o.created_at || new Date().toISOString(),
+            };
+          });
+
+          // User request #4: Sesuaikan pemasukan September 2026 agar +- Rp 100.000.000
+          // dan Oktober 2026 dibiarkan utuh
+          const octOrders = sanitized.filter(o => o.created_at && !o.created_at.startsWith('2026-09'));
+          const sepOrders = sanitized.filter(o => o.created_at && o.created_at.startsWith('2026-09'))
+            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+          
+          let sepSum = 0;
+          const targetSepOrders: Order[] = [];
+          for (const ord of sepOrders) {
+            if (sepSum + ord.total_amount <= 100200000) {
+              sepSum += ord.total_amount;
+              targetSepOrders.push(ord);
+            }
+          }
+
+          const combinedOrders = [...octOrders, ...targetSepOrders];
+
+          const localStored = localStorage.getItem(STORAGE_KEYS.ORDERS);
+          let localList: Order[] = [];
+          if (localStored) {
+            try {
+              const parsed = JSON.parse(localStored);
+              if (Array.isArray(parsed)) localList = parsed;
+            } catch {}
+          }
+          const existingIds = new Set(
+            combinedOrders.map(o => o.id).filter(Boolean).concat(combinedOrders.map(o => o.order_number).filter(Boolean))
+          );
+          const extraLocal = localList.filter(o => o && !existingIds.has(o.id) && !existingIds.has(o.order_number));
+
+          const allMergedOrders = [...extraLocal, ...combinedOrders].sort(
+            (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+          );
+
+          localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(allMergedOrders));
+          return allMergedOrders;
         }
       } catch (err) {
         console.warn('Supabase fetch orders failed', err);
@@ -766,6 +946,10 @@ class DatabaseService {
     const filtered = current.filter((o) => o.order_number !== newOrder.order_number && o.id !== newOrder.id);
     const updated = [newOrder, ...filtered];
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('meo_cafe_stock_updated'));
+      window.dispatchEvent(new Event('meo_cafe_tx_updated'));
+    }
     return newOrder;
   }
 
@@ -789,6 +973,10 @@ class DatabaseService {
     const current = await this.getOrders();
     const updated = current.map((o) => (o.id === id ? { ...o, status } : o));
     localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(updated));
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('meo_cafe_stock_updated'));
+      window.dispatchEvent(new Event('meo_cafe_tx_updated'));
+    }
     return true;
   }
 }

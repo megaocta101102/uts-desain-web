@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   UserPlus,
   UserCheck,
@@ -15,12 +16,14 @@ import {
   CheckCircle2,
   Users,
   Copy,
-  Check
+  Check,
+  Calendar
 } from 'lucide-react';
 import { User as UserType } from '../types';
 import { db } from '../services/supabase';
 
 export const OwnerKasirPage: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<UserType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -65,6 +68,11 @@ export const OwnerKasirPage: React.FC = () => {
 
   useEffect(() => {
     loadUsers();
+    const handleUpdate = () => {
+      loadUsers();
+    };
+    window.addEventListener('meo_cafe_users_updated', handleUpdate);
+    return () => window.removeEventListener('meo_cafe_users_updated', handleUpdate);
   }, []);
 
   // Split Users into Owner & Kasir
@@ -136,12 +144,15 @@ export const OwnerKasirPage: React.FC = () => {
       alert('Minimal harus ada 1 akun owner yang aktif untuk mengelola sistem.');
       return;
     }
-    const newStatus = user.status === 'aktif' ? 'nonaktif' : 'aktif';
+    const newStatus: 'aktif' | 'nonaktif' = user.status === 'aktif' ? 'nonaktif' : 'aktif';
     try {
-      await db.updateUser(user.id, { status: newStatus });
+      await db.updateUser(user.id, { username: user.username, status: newStatus });
       await loadUsers();
+      setSuccessMsg(`Status akun ${user.name} berhasil diubah menjadi ${newStatus === 'aktif' ? 'Aktif' : 'Nonaktif'}!`);
+      setTimeout(() => setSuccessMsg(''), 3000);
     } catch (err) {
       console.error('Failed to toggle status', err);
+      setErrorMsg('Gagal mengubah status akun.');
     }
   };
 
@@ -386,13 +397,24 @@ export const OwnerKasirPage: React.FC = () => {
                 </div>
               </div>
 
-              <button
-                onClick={() => handleOpenAdd('kasir')}
-                className="clay-btn clay-btn-primary !py-2 !px-4 text-xs font-bold flex items-center justify-center gap-1.5 self-start sm:self-auto"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span>+ Tambah Kasir</span>
-              </button>
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  onClick={() => navigate('/owner/jadwal')}
+                  className="clay-btn clay-btn-secondary !py-2 !px-4 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer border border-blue-200 text-blue-700 bg-blue-50/70 hover:bg-blue-100"
+                  title="Lihat Jadwal Kasir"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Jadwal Kasir</span>
+                </button>
+
+                <button
+                  onClick={() => handleOpenAdd('kasir')}
+                  className="clay-btn clay-btn-primary !py-2 !px-4 text-xs font-bold flex items-center justify-center gap-1.5"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>+ Tambah Kasir</span>
+                </button>
+              </div>
             </div>
 
             {/* Filter & Search Bar */}
@@ -537,33 +559,37 @@ export const OwnerKasirPage: React.FC = () => {
                         {/* Status Toggle Button */}
                         <div className="flex items-center gap-2 self-start md:self-auto">
                           <button
+                            type="button"
                             onClick={() => handleToggleStatus(cashier)}
-                            className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                            className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 border ${
                               cashier.status === 'aktif'
-                                ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                                : 'bg-red-100 text-red-700 hover:bg-red-200'
+                                ? 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border-emerald-300'
+                                : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border-rose-300'
                             }`}
-                            title="Klik untuk ubah status aktif/nonaktif"
+                            title={`Status saat ini: ${cashier.status === 'aktif' ? 'Aktif' : 'Nonaktif'}. Klik untuk mengubah.`}
                           >
-                            <span className={`w-1.5 h-1.5 rounded-full ${cashier.status === 'aktif' ? 'bg-emerald-600' : 'bg-red-600'}`}></span>
+                            <span className={`w-2 h-2 rounded-full ${cashier.status === 'aktif' ? 'bg-emerald-600' : 'bg-rose-600'}`}></span>
                             <span>{cashier.status === 'aktif' ? 'Aktif' : 'Nonaktif'}</span>
                           </button>
                         </div>
 
-                        {/* Actions */}
+                        {/* Actions (Tetap ada Edit & Hapus yang berfungsi penuh untuk aktif maupun nonaktif) */}
                         <div className="flex items-center gap-2 self-end md:self-auto pt-2 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-end">
                           <button
+                            type="button"
                             onClick={() => handleOpenEdit(cashier)}
-                            className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs font-semibold flex items-center gap-1"
+                            className="clay-btn clay-btn-secondary !py-1.5 !px-3 text-xs font-semibold flex items-center gap-1 cursor-pointer hover:bg-slate-200 transition-colors"
+                            title={`Edit Akun Kasir ${cashier.name}`}
                           >
-                            <Edit2 className="w-3 h-3" />
+                            <Edit2 className="w-3 h-3 text-blue-600" />
                             <span>Edit</span>
                           </button>
 
                           <button
+                            type="button"
                             onClick={() => handleDelete(cashier.id, cashier.name, 'kasir')}
-                            className="p-1.5 rounded-xl text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
-                            title="Hapus Kasir"
+                            className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors cursor-pointer"
+                            title={`Hapus Akun Kasir ${cashier.name}`}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

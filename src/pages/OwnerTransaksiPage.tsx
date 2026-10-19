@@ -289,26 +289,28 @@ export const OwnerTransaksiPage: React.FC = () => {
         
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-blue-100">
-          <div>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center shadow-xs">
-                <Receipt className="w-5 h-5" />
-              </div>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-sans">
-                  Riwayat Transaksi Kasir
-                </h1>
-                <p className="text-xs text-slate-500">
-                  {selectedDate ? (
-                    <span>
-                      Menampilkan transaksi tanggal:{' '}
-                      <strong className="text-blue-600">{formatIndonesianDate(selectedDate)}</strong>
-                    </span>
-                  ) : (
-                    <span>Semua riwayat transaksi kasir diurutkan dari yang terbaru</span>
-                  )}
-                </p>
-              </div>
+          <div className="flex items-center gap-4">
+            <Link
+              to="/owner/statistik"
+              className="w-10 h-10 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 transition-colors shadow-sm shrink-0"
+              title="Kembali ke Statistik"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-sans">
+                Riwayat Transaksi Kasir
+              </h1>
+              <p className="text-xs text-slate-500">
+                {selectedDate ? (
+                  <span>
+                    Menampilkan transaksi tanggal:{' '}
+                    <strong className="text-blue-600">{formatIndonesianDate(selectedDate)}</strong>
+                  </span>
+                ) : (
+                  <span>Semua riwayat transaksi kasir diurutkan dari yang terbaru</span>
+                )}
+              </p>
             </div>
           </div>
 
@@ -322,14 +324,6 @@ export const OwnerTransaksiPage: React.FC = () => {
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
               <span>Muat Ulang</span>
             </button>
-            <Link
-              to="/owner/statistik"
-              className="clay-btn clay-btn-primary !py-2 !px-4 text-xs font-semibold flex items-center gap-1.5 shadow-sm"
-              title="Kembali ke Dashboard Statistik"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Kembali</span>
-            </Link>
           </div>
         </div>
 

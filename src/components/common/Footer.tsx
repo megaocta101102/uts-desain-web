@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Coffee,
   Phone,
@@ -13,6 +13,12 @@ import {
 import { DEFAULT_CONFIG } from '../../services/config';
 
 export const Footer: React.FC = () => {
+  const location = useLocation();
+  const isSubDetailPage =
+    location.pathname === '/owner/keuangan/riwayat' ||
+    location.pathname === '/owner/stok' ||
+    location.pathname === '/owner/transaksi';
+
   return (
     <footer id="infoSection" className="bg-slate-900 text-slate-300 border-t border-slate-800">
       {/* Main Footer Content */}
@@ -132,51 +138,53 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Column 4: Navigasi Cepat (Hanya tampil di HP / Mobile, disembunyikan di Laptop/Desktop) */}
-          <div className="space-y-4 md:hidden pt-4 border-t border-slate-800">
-            <h3 className="text-base font-bold text-white tracking-wide font-display border-b border-slate-800 pb-2">
-              Navigasi Cepat
-            </h3>
+          {/* Column 4: Navigasi Cepat (Hanya tampil di HP / Mobile, disembunyikan di sub-halaman yang ada tombol kembali) */}
+          {!isSubDetailPage && (
+            <div className="space-y-4 md:hidden pt-4 border-t border-slate-800">
+              <h3 className="text-base font-bold text-white tracking-wide font-display border-b border-slate-800 pb-2">
+                Navigasi Cepat
+              </h3>
 
-            <ul className="space-y-2.5 text-sm">
-              <li>
-                <Link
-                  to="/"
-                  className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2 group text-xs"
-                >
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
-                  <span>Beranda</span>
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="/#menuSection"
-                  className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2 group text-xs"
-                >
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
-                  <span>Daftar Menu & Kategori</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#infoSection"
-                  className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2 group text-xs"
-                >
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
-                  <span>Kontak & Jam Kerja</span>
-                </a>
-              </li>
-              <li className="pt-2 border-t border-slate-800/80">
-                <Link
-                  to="/login"
-                  className="text-blue-400 hover:text-blue-300 font-semibold transition-colors inline-flex items-center gap-2 group text-xs"
-                >
-                  <ChevronRight className="w-3.5 h-3.5 text-blue-500 group-hover:translate-x-0.5 transition-transform" />
-                  <span>Portal Login Staf (Kasir / Owner)</span>
-                </Link>
-              </li>
-            </ul>
-          </div>
+              <ul className="space-y-2.5 text-sm">
+                <li>
+                  <Link
+                    to="/"
+                    className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2 group text-xs"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
+                    <span>Beranda</span>
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="/#menuSection"
+                    className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2 group text-xs"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
+                    <span>Daftar Menu & Kategori</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#infoSection"
+                    className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-2 group text-xs"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-blue-400 transition-colors" />
+                    <span>Kontak & Jam Kerja</span>
+                  </a>
+                </li>
+                <li className="pt-2 border-t border-slate-800/80">
+                  <Link
+                    to="/login"
+                    className="text-blue-400 hover:text-blue-300 font-semibold transition-colors inline-flex items-center gap-2 group text-xs"
+                  >
+                    <ChevronRight className="w-3.5 h-3.5 text-blue-500 group-hover:translate-x-0.5 transition-transform" />
+                    <span>Portal Login Staf (Kasir / Owner)</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          )}
 
         </div>
       </div>
