@@ -511,10 +511,10 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
 
             </div>
 
-            {/* Kolom Kanan: 2 Kotak Pemasukan & Pengeluaran */}
-            <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-2.5">
+            {/* Kolom Kanan: 3 Kotak Pemasukan, Pengeluaran & Kerugian */}
+            <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-2">
               
-              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 shadow-2xs h-[40px] hover:shadow-xs transition-shadow">
+              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 shadow-2xs h-[38px] hover:shadow-xs transition-shadow">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
                     <TrendingUp className="w-3.5 h-3.5" />
@@ -526,7 +526,7 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50/90 border border-rose-200/90 text-rose-950 shadow-2xs h-[40px] hover:shadow-xs transition-shadow">
+              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50/90 border border-rose-200/90 text-rose-950 shadow-2xs h-[38px] hover:shadow-xs transition-shadow">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
                     <TrendingDown className="w-3.5 h-3.5" />
@@ -535,6 +535,18 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
                 </div>
                 <span className="text-sm font-black text-rose-700 tracking-tight">
                   -{formatCurrency(totalPengeluaranFiltered)}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-amber-50/90 border border-amber-300/90 text-amber-950 shadow-2xs h-[38px] hover:shadow-xs transition-shadow">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-xs font-black uppercase tracking-wide text-amber-800">Kerugian</span>
+                </div>
+                <span className="text-sm font-black text-amber-800 tracking-tight">
+                  -{formatCurrency(totalKerugianFiltered)}
                 </span>
               </div>
 
@@ -565,11 +577,6 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
                 </button>
               )}
             </div>
-            {totalKerugianFiltered > 0 && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-300 shadow-2xs">
-                Kerugian: -{formatCurrency(totalKerugianFiltered)}
-              </span>
-            )}
           </div>
 
         </div>

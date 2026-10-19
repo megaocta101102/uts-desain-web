@@ -451,7 +451,7 @@ export const OwnerKeuanganPage: React.FC = () => {
               <Calendar className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 sm:mt-4.5">
+          <div className="mt-6 sm:mt-6.5">
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight" title={formatCurrency(totalEstimatedBudget)}>
               {formatCurrency(totalEstimatedBudget)}
             </h3>
@@ -468,7 +468,7 @@ export const OwnerKeuanganPage: React.FC = () => {
               <TrendingDown className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 sm:mt-4.5">
+          <div className="mt-6 sm:mt-6.5">
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight" title={formatCurrency(totalExpenses)}>
               {formatCurrency(totalExpenses)}
             </h3>
@@ -485,7 +485,7 @@ export const OwnerKeuanganPage: React.FC = () => {
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 sm:mt-4.5">
+          <div className="mt-6 sm:mt-6.5">
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight" title={formatCurrency(totalIncomeDisplay)}>
               {formatCurrency(totalIncomeDisplay)}
             </h3>
@@ -502,7 +502,7 @@ export const OwnerKeuanganPage: React.FC = () => {
               <Trash2 className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 sm:mt-4.5">
+          <div className="mt-6 sm:mt-6.5">
             <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight" title={formatCurrency(expiredStockLoss)}>
               {formatCurrency(expiredStockLoss)}
             </h3>
@@ -519,7 +519,7 @@ export const OwnerKeuanganPage: React.FC = () => {
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <div className="mt-4 sm:mt-4.5">
+          <div className="mt-6 sm:mt-6.5">
             <h3 className={`text-lg sm:text-xl font-extrabold tracking-tight ${cashBalance >= 0 ? 'text-blue-600' : 'text-red-600'}`} title={formatCurrency(cashBalance)}>
               {formatCurrency(cashBalance)}
             </h3>
