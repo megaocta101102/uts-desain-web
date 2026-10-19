@@ -468,7 +468,7 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
             
             {/* Kolom Kiri: Filter Controls */}
-            <div className="lg:col-span-7 xl:col-span-8 flex flex-col justify-between gap-2.5">
+            <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-2.5">
               
               {/* Baris 1: Pencarian */}
               <div className="relative w-full">
@@ -511,10 +511,10 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
 
             </div>
 
-            {/* Kolom Kanan: 3 Kotak Pemasukan, Pengeluaran & Kerugian */}
-            <div className="lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-2">
+            {/* Kolom Kanan: Kotak Pemasukan & Pengeluaran */}
+            <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-2.5">
               
-              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 shadow-2xs h-[38px] hover:shadow-xs transition-shadow">
+              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50/90 border border-emerald-200/90 text-emerald-950 shadow-2xs h-[40px] hover:shadow-xs transition-shadow">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
                     <TrendingUp className="w-3.5 h-3.5" />
@@ -526,7 +526,7 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50/90 border border-rose-200/90 text-rose-950 shadow-2xs h-[38px] hover:shadow-xs transition-shadow">
+              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50/90 border border-rose-200/90 text-rose-950 shadow-2xs h-[40px] hover:shadow-xs transition-shadow">
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600 shrink-0">
                     <TrendingDown className="w-3.5 h-3.5" />
@@ -538,23 +538,11 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-amber-50/90 border border-amber-300/90 text-amber-950 shadow-2xs h-[38px] hover:shadow-xs transition-shadow">
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-lg bg-amber-100 flex items-center justify-center text-amber-700 shrink-0">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-wide text-amber-800">Kerugian</span>
-                </div>
-                <span className="text-sm font-black text-amber-800 tracking-tight">
-                  -{formatCurrency(totalKerugianFiltered)}
-                </span>
-              </div>
-
             </div>
 
           </div>
 
-          {/* Sub-bar Informasi / Status Transaksi */}
+          {/* Sub-bar Informasi: Transaksi Ditemukan (Kiri) dan Kerugian (Kanan) Lurus Satu Baris */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
             <div className="flex flex-wrap items-center gap-2 text-slate-500 font-medium">
               <span className="font-bold text-slate-700">{filteredTransactions.length}</span> transaksi ditemukan
@@ -576,6 +564,17 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
                   Reset Filter
                 </button>
               )}
+            </div>
+
+            {/* Kotak Kerugian Kecil di Kanan Sebaris Lurus */}
+            <div className="flex items-center">
+              <span
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-2xs"
+                title="Total akumulasi kerugian stok kadaluwarsa"
+              >
+                <Trash2 className="w-3 h-3 text-amber-700" />
+                <span>Kerugian: -{formatCurrency(totalKerugianFiltered)}</span>
+              </span>
             </div>
           </div>
 
