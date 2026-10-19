@@ -301,9 +301,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 110000,
     supplier: 'PT Kopi Gayo Mandiri',
-    sepRestock: 10,
+    sepRestock: 13,
     octRestockBase: 8,
-    monthlyEstimatedNeed: 9,
+    monthlyEstimatedNeed: 13,
     sepExpiry: '2026-12-15',
     octExpiry: '2027-04-20',
   },
@@ -314,9 +314,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'liter',
     costPerUnit: 24000,
     supplier: 'Jaya Dairy Farm',
-    sepRestock: 75,
+    sepRestock: 97,
     octRestockBase: 59,
-    monthlyEstimatedNeed: 80,
+    monthlyEstimatedNeed: 97,
     sepExpiry: '2026-11-28',
     octExpiry: '2027-01-20',
   },
@@ -327,9 +327,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'liter',
     costPerUnit: 42000,
     supplier: 'Oatside Supplier ID',
-    sepRestock: 20,
+    sepRestock: 25.5,
     octRestockBase: 10,
-    monthlyEstimatedNeed: 20,
+    monthlyEstimatedNeed: 25.5,
     sepExpiry: '2026-12-10',
     octExpiry: '2027-03-15',
   },
@@ -366,9 +366,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'liter',
     costPerUnit: 85000,
     supplier: 'Monin Distributindo',
-    sepRestock: 9.5,
+    sepRestock: 10.5,
     octRestockBase: 4.5,
-    monthlyEstimatedNeed: 10,
+    monthlyEstimatedNeed: 10.5,
     sepExpiry: '2027-02-20',
     octExpiry: '2027-08-20',
   },
@@ -379,9 +379,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'liter',
     costPerUnit: 14000,
     supplier: 'Polaris Beverage',
-    sepRestock: 31,
+    sepRestock: 38,
     octRestockBase: 20,
-    monthlyEstimatedNeed: 35,
+    monthlyEstimatedNeed: 38,
     sepExpiry: '2027-01-10',
     octExpiry: '2027-05-10',
   },
@@ -392,9 +392,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 150000,
     supplier: 'Meat Master Malang',
-    sepRestock: 28,
+    sepRestock: 33,
     octRestockBase: 10,
-    monthlyEstimatedNeed: 30,
+    monthlyEstimatedNeed: 33,
     sepExpiry: '2026-12-25',
     octExpiry: '2027-02-28',
   },
@@ -405,9 +405,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 180000,
     supplier: 'Ocean Seafood Co.',
-    sepRestock: 30,
+    sepRestock: 36,
     octRestockBase: 12,
-    monthlyEstimatedNeed: 30,
+    monthlyEstimatedNeed: 36,
     sepExpiry: '2026-12-20',
     octExpiry: '2027-02-15',
   },
@@ -418,9 +418,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 48000,
     supplier: 'Barilla Import',
-    sepRestock: 15,
+    sepRestock: 20.5,
     octRestockBase: 14.5,
-    monthlyEstimatedNeed: 15,
+    monthlyEstimatedNeed: 20.5,
     sepExpiry: '2027-04-10',
     octExpiry: '2027-10-10',
   },
@@ -431,9 +431,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'liter',
     costPerUnit: 320000,
     supplier: 'Urbani Truffle ID',
-    sepRestock: 5,
+    sepRestock: 5.5,
     octRestockBase: 2,
-    monthlyEstimatedNeed: 5,
+    monthlyEstimatedNeed: 5.5,
     sepExpiry: '2027-03-20',
     octExpiry: '2027-07-20',
   },
@@ -444,9 +444,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 170000,
     supplier: 'Zanetti Cheese',
-    sepRestock: 8,
+    sepRestock: 9,
     octRestockBase: 6,
-    monthlyEstimatedNeed: 10,
+    monthlyEstimatedNeed: 9,
     sepExpiry: '2026-12-30',
     octExpiry: '2027-03-15',
   },
@@ -457,9 +457,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'liter',
     costPerUnit: 65000,
     supplier: 'Anchor Food Professionals',
-    sepRestock: 26.5,
+    sepRestock: 34,
     octRestockBase: 19,
-    monthlyEstimatedNeed: 25,
+    monthlyEstimatedNeed: 34,
     sepExpiry: '2026-10-02',
     octExpiry: '2027-02-28',
   },
@@ -470,9 +470,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 95000,
     supplier: 'Fonterra Brands',
-    sepRestock: 10,
+    sepRestock: 13,
     octRestockBase: 9.5,
-    monthlyEstimatedNeed: 10,
+    monthlyEstimatedNeed: 13,
     sepExpiry: '2026-12-20',
     octExpiry: '2027-01-20',
   },
@@ -483,9 +483,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 35000,
     supplier: 'Lamb Weston Frozen',
-    sepRestock: 50,
+    sepRestock: 60,
     octRestockBase: 48,
-    monthlyEstimatedNeed: 50,
+    monthlyEstimatedNeed: 60,
     sepExpiry: '2027-01-10',
     octExpiry: '2027-04-10',
   },
@@ -496,9 +496,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'pcs',
     costPerUnit: 12000,
     supplier: 'Bridor France Bakery',
-    sepRestock: 150,
+    sepRestock: 180,
     octRestockBase: 142,
-    monthlyEstimatedNeed: 150,
+    monthlyEstimatedNeed: 180,
     sepExpiry: '2026-11-28',
     octExpiry: '2026-12-28',
   },
@@ -509,7 +509,7 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 140000,
     supplier: 'Blue Diamond Nut',
-    sepRestock: 4.5,
+    sepRestock: 5,
     octRestockBase: 2,
     monthlyEstimatedNeed: 5,
     sepExpiry: '2027-02-15',
@@ -522,9 +522,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'pcs',
     costPerUnit: 9000,
     supplier: 'La Rose Noire Pastry',
-    sepRestock: 162,
+    sepRestock: 205,
     octRestockBase: 140,
-    monthlyEstimatedNeed: 170,
+    monthlyEstimatedNeed: 205,
     sepExpiry: '2026-12-28',
     octExpiry: '2027-02-28',
   },
@@ -535,9 +535,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 95000,
     supplier: 'Darbo Fruit ID',
-    sepRestock: 6.5,
+    sepRestock: 9,
     octRestockBase: 6,
-    monthlyEstimatedNeed: 8,
+    monthlyEstimatedNeed: 9,
     sepExpiry: '2027-01-15',
     octExpiry: '2027-05-15',
   },
@@ -548,9 +548,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 32000,
     supplier: 'Japonica Rice ID',
-    sepRestock: 24,
+    sepRestock: 33,
     octRestockBase: 23,
-    monthlyEstimatedNeed: 25,
+    monthlyEstimatedNeed: 33,
     sepExpiry: '2027-04-01',
     octExpiry: '2027-09-01',
   },
@@ -561,9 +561,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'kg',
     costPerUnit: 45000,
     supplier: 'Taiwan Boba House',
-    sepRestock: 3.7,
+    sepRestock: 4.5,
     octRestockBase: 3.5,
-    monthlyEstimatedNeed: 5,
+    monthlyEstimatedNeed: 4.5,
     sepExpiry: '2027-01-20',
     octExpiry: '2027-05-20',
   },
@@ -574,9 +574,9 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
     unit: 'pack',
     costPerUnit: 35000,
     supplier: 'Kraft Heinz Foodservice',
-    sepRestock: 9,
+    sepRestock: 17,
     octRestockBase: 4,
-    monthlyEstimatedNeed: 9,
+    monthlyEstimatedNeed: 17,
     sepExpiry: '2026-12-10',
     octExpiry: '2027-02-10',
   },
@@ -598,6 +598,22 @@ export const BASE_MATERIALS_CONFIG: MaterialConfig[] = [
 const STORAGE_KEY_DYNAMIC_RESTOCKS = 'meo_cafe_dynamic_restocks_v3';
 const STORAGE_KEY_CUSTOM_MATERIALS = 'meo_cafe_custom_materials_v3';
 const STORAGE_KEY_CUSTOM_ESTIMATES = 'meo_cafe_custom_estimates_v2';
+
+export const BASE_EXPIRED_WRITEOFFS: ExpiredWriteOffRecord[] = [
+  {
+    id: 'wo-cooking-cream-oct-2026',
+    materialId: 'mat-cooking-cream',
+    materialName: 'Cooking Cream UHT',
+    qty: 0.69,
+    unit: 'liter',
+    costPerUnit: 65000,
+    totalLoss: 44850,
+    date: '2026-10-02',
+    period: '2026-10',
+    notes: 'Stok kadaluwarsa dikeluarkan dari gudang',
+    createdAt: '2026-10-02T10:00:00.000Z',
+  }
+];
 
 export const DEFAULT_SEPTEMBER_RESTOCKS: any[] = [];
 
@@ -739,7 +755,7 @@ export const inventoryService = {
         expiryOld = '- (Batch Pertama)';
         expiryNew = cfg.sepExpiry;
       } else if (periodMonth === '2026-10') {
-        prevStock = sepEndingStock;
+        prevStock = cfg.id === 'mat-cooking-cream' ? Math.max(sepEndingStock, 1.48) : sepEndingStock;
 
         // Restock bulan Oktober 2026: mengembalikan data restock yang diisikan (octRestockBase) + penambahan manual
         const dynamicAdd = dynamicRestocks
@@ -956,12 +972,17 @@ export const inventoryService = {
 
   // Mengambil daftar riwayat stok kadaluwarsa yang telah dikeluarkan
   getExpiredWriteOffs(): ExpiredWriteOffRecord[] {
-    if (typeof window === 'undefined') return [];
+    if (typeof window === 'undefined') return [...BASE_EXPIRED_WRITEOFFS];
     try {
       const saved = localStorage.getItem(STORAGE_KEY_EXPIRED_WRITEOFFS);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+      localStorage.setItem(STORAGE_KEY_EXPIRED_WRITEOFFS, JSON.stringify(BASE_EXPIRED_WRITEOFFS));
+      return [...BASE_EXPIRED_WRITEOFFS];
     } catch {
-      return [];
+      return [...BASE_EXPIRED_WRITEOFFS];
     }
   },
 

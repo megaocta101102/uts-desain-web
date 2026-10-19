@@ -78,16 +78,37 @@ export const OwnerKeuanganPage: React.FC = () => {
       setManualTransactions(getSavedTransactions());
     };
     window.addEventListener('meo_cafe_tx_updated', handleUpdate);
-    return () => window.removeEventListener('meo_cafe_tx_updated', handleUpdate);
+    window.addEventListener('meo_cafe_stock_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('meo_cafe_tx_updated', handleUpdate);
+      window.removeEventListener('meo_cafe_stock_updated', handleUpdate);
+    };
   }, []);
 
   // Hitung jumlah Staf KASIR aktif (hanya kasir saja, owner tidak dihitung di gaji karyawan)
   const activeKasirCount = useMemo(() => {
     const kasirUsers = users.filter((u) => u.role === 'kasir' && u.status !== 'nonaktif');
-    return kasirUsers.length > 0 ? kasirUsers.length : 2; // Default 2 staf kasir (Cindy & Lulu)
+    return kasirUsers.length > 0 ? kasirUsers.length : 6;
   }, [users]);
 
-  const kasirSalaryTotal = activeKasirCount * 4000000; // Rp 4.000.000 per staf kasir = Rp 8.000.000
+  // Aturan Gaji Kasir:
+  // - September: Belum digaji (awal beroperasi) -> 0 kasir (Rp 0)
+  // - Oktober: Digaji 2 kasir lama Cindy & Lulu (Rp 8.000.000). Kasir baru di bulan pertama belum digaji.
+  // - November dan seterusnya: Kasir baru mulai digaji penuh bersama kasir lama (full kasir aktif)
+  const eligibleKasirCount = useMemo(() => {
+    if (selectedPeriod <= '2026-09') return 0;
+    if (selectedPeriod === '2026-10') return 2;
+    return activeKasirCount;
+  }, [selectedPeriod, activeKasirCount]);
+
+  const kasirSalaryForPeriod = eligibleKasirCount * 4000000;
+
+  // Estimasi Biaya Pembelian Bahan Baku dihitung otomatis dari estimasi kebutuhan stok komoditas
+  const estimatedMaterialExpense = useMemo(() => {
+    const stocks = inventoryService.calculateStockWithOrders(orders, selectedPeriod);
+    const sum = stocks.reduce((total, mat) => total + (mat.monthlyEstimatedNeed * mat.costPerUnit), 0);
+    return sum > 0 ? sum : 37291000;
+  }, [orders, selectedPeriod]);
 
   // Pengeluaran aktual berdasarkan transaksi yang tercatat di periode terpilih
   // Jika periode adalah bulan ke depannya (> 2026-10) dan belum ada transaksi otomatis tersimpan,
@@ -109,18 +130,24 @@ export const OwnerKeuanganPage: React.FC = () => {
     if (selectedPeriod > '2026-10') {
       const hasAutoSalary = operationalTxs.some(t => t.category === 'Gaji Karyawan' && t.isRecurringAuto);
       if (!hasAutoSalary) {
-        const autoRecurring = generateAutoRecurringExpenses(selectedPeriod);
+        const autoRecurring = generateAutoRecurringExpenses(selectedPeriod, activeKasirCount);
         return [...operationalTxs, ...autoRecurring];
       }
     }
 
     return operationalTxs;
-  }, [manualTransactions, selectedPeriod]);
+  }, [manualTransactions, selectedPeriod, activeKasirCount]);
 
   // Total biaya belanja bahan baku aktual di bulan terpilih (manual oleh owner)
   const actualMaterialExpense = useMemo(() => {
     return expensesForSelectedPeriod
       .filter((tx) => tx.category === 'Bahan Baku')
+      .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
+  }, [expensesForSelectedPeriod]);
+
+  const actualSalaryExpense = useMemo(() => {
+    return expensesForSelectedPeriod
+      .filter((tx) => tx.category === 'Gaji Karyawan')
       .reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
   }, [expensesForSelectedPeriod]);
 
@@ -162,17 +189,21 @@ export const OwnerKeuanganPage: React.FC = () => {
     { 
       id: 'bud-1', 
       name: 'Pembelian Bahan Baku (Logistik)', 
-      estimated: 31840000, 
-      actual: actualMaterialExpense || (selectedPeriod === '2026-09' ? 29387000 : (selectedPeriod === '2026-10' ? 19514500 : 0)), 
+      estimated: estimatedMaterialExpense, 
+      actual: actualMaterialExpense || (selectedPeriod === '2026-09' ? 37291000 : (selectedPeriod === '2026-10' ? 19514500 : 0)), 
       icon: 'Package',
       systemTag: 'Manual Sesuai Kebutuhan',
       isAuto: false,
     },
     { 
       id: 'bud-2', 
-      name: `Gaji Karyawan (${activeKasirCount} Kasir, Terpotong Tgl 2)`, 
-      estimated: kasirSalaryTotal, 
-      actual: kasirSalaryTotal, 
+      name: selectedPeriod <= '2026-09' 
+        ? 'Gaji Karyawan' 
+        : `Gaji Karyawan (${eligibleKasirCount} Kasir, Terpotong Tgl 2)`, 
+      estimated: kasirSalaryForPeriod, 
+      actual: selectedPeriod <= '2026-09' 
+        ? 0 
+        : (actualSalaryExpense > 0 ? actualSalaryExpense : kasirSalaryForPeriod), 
       icon: 'Users',
       systemTag: 'Otomatis Tgl 2',
       isAuto: true,
@@ -222,13 +253,18 @@ export const OwnerKeuanganPage: React.FC = () => {
       systemTag: 'Manual oleh Owner',
       isAuto: false,
     }] : []),
-  ], [activeKasirCount, kasirSalaryTotal, actualMaterialExpense, actualUtilityExpense, actualTransportExpense, actualServiceExpense, actualEmergencyExpense, actualOtherExpense, selectedPeriod]);
+  ], [activeKasirCount, eligibleKasirCount, kasirSalaryForPeriod, estimatedMaterialExpense, actualMaterialExpense, actualSalaryExpense, actualUtilityExpense, actualTransportExpense, actualServiceExpense, actualEmergencyExpense, actualOtherExpense, selectedPeriod]);
 
   // Pemasukan dari Pesanan POS pada periode terpilih
   const periodPosIncome = useMemo(() => {
-    return orders
+    const calculated = orders
       .filter((o) => o.status !== 'dibatalkan' && o.created_at && o.created_at.startsWith(selectedPeriod))
       .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
+    if (calculated === 0) {
+      if (selectedPeriod === '2026-09') return 180000000;
+      if (selectedPeriod === '2026-10') return 150000000;
+    }
+    return calculated;
   }, [orders, selectedPeriod]);
 
   // Modal / Pemasukan manual di bulan terpilih (misal modal awal September)
@@ -249,8 +285,8 @@ export const OwnerKeuanganPage: React.FC = () => {
   }, [budgets]);
 
   // Perhitungan akumulasi keuangan berjalan dari bulan ke bulan
-  // September 2026: Saldo awal = 0, Saldo akhir September = Rp 234.017.500
-  // Oktober 2026: Total Pemasukan Akumulasi = Saldo September (234.017.500) + Pendapatan Oktober (56.174.800) = 290.192.300
+  // September 2026: Saldo awal = 0, Pemasukan = Modal Awal (Rp 190.000.000) + Penjualan POS (Rp 180.000.000)
+  // Oktober 2026: Pemasukan Akumulasi = Saldo bulan sebelumnya (setelah dipotong setoran akhir bulan lalu) + Pendapatan Penjualan POS (Rp 150.000.000)
   // Bulan-bulan berikutnya: Saldo bulan sebelumnya + Pemasukan bulan berjalan
   const monthlyRollData = useMemo(() => {
     const [selYearStr, selMonthStr] = selectedPeriod.split('-');
@@ -262,13 +298,19 @@ export const OwnerKeuanganPage: React.FC = () => {
     let runningBalance = 0;
     let prevBalForCurrentPeriod = 0;
     let accumIncomeForCurrentPeriod = 0;
+    let currentPeriodCashBalance = 0;
 
     while (curYear < selYear || (curYear === selYear && curMonth <= selMonth)) {
       const pStr = `${curYear}-${String(curMonth).padStart(2, '0')}`;
       
-      const posInc = orders
+      let posInc = orders
         .filter((o) => o.status !== 'dibatalkan' && o.created_at && o.created_at.startsWith(pStr))
         .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
+
+      if (posInc === 0) {
+        if (pStr === '2026-09') posInc = 180000000;
+        else if (pStr === '2026-10') posInc = 150000000;
+      }
 
       const manualInc = manualTransactions
         .filter((tx) => tx.type === 'Pemasukan' && tx.date.startsWith(pStr))
@@ -301,7 +343,7 @@ export const OwnerKeuanganPage: React.FC = () => {
       if (pStr > '2026-10') {
         const hasAutoSalary = operationalTxs.some((t) => t.category === 'Gaji Karyawan' && t.isRecurringAuto);
         if (!hasAutoSalary) {
-          const autoRecurring = generateAutoRecurringExpenses(pStr);
+          const autoRecurring = generateAutoRecurringExpenses(pStr, activeKasirCount);
           operationalTxs.push(...autoRecurring);
         }
       }
@@ -309,26 +351,27 @@ export const OwnerKeuanganPage: React.FC = () => {
       const exp = operationalTxs.reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 
       if (pStr === '2026-09') {
-        const sepIncome = manualInc > 0 ? (posInc + manualInc) : (posInc + 190101300);
-        // Saldo September dibiarkan utuh Rp 234.017.500
-        runningBalance = 234017500;
+        const sepIncome = manualInc > 0 ? (posInc + manualInc) : (posInc + 190000000);
+        const endBal = sepIncome - exp;
+        const balanceAfterSetoran = endBal - setoranAkhirBulanIni;
+        runningBalance = balanceAfterSetoran;
         if (pStr === selectedPeriod) {
           prevBalForCurrentPeriod = 0;
           accumIncomeForCurrentPeriod = sepIncome;
+          currentPeriodCashBalance = balanceAfterSetoran;
         }
-        // Saldo yang dibawa ke bulan berikutnya dipotong setoran akhir September
-        runningBalance = Math.max(0, runningBalance - setoranAkhirBulanIni);
       } else {
         const monthIncome = posInc + manualInc;
-        // Pemasukan akumulasi = Saldo bulan sebelumnya (setelah dipotong setoran akhir) + Pendapatan bulan saat itu
+        // Pemasukan akumulasi = Saldo bulan sebelumnya (setelah dipotong setoran akhir bulan lalu) + Pendapatan penjualan bulan saat itu
         const accumInc = runningBalance + monthIncome;
         const endBal = accumInc - exp;
+        const balanceAfterSetoran = endBal - setoranAkhirBulanIni;
         if (pStr === selectedPeriod) {
           prevBalForCurrentPeriod = runningBalance;
           accumIncomeForCurrentPeriod = accumInc;
+          currentPeriodCashBalance = balanceAfterSetoran;
         }
-        // Saldo yang dibawa ke bulan berikutnya dipotong setoran akhir bulan ini
-        runningBalance = Math.max(0, endBal - setoranAkhirBulanIni);
+        runningBalance = balanceAfterSetoran;
       }
 
       curMonth++;
@@ -341,16 +384,12 @@ export const OwnerKeuanganPage: React.FC = () => {
     return {
       prevMonthBalance: prevBalForCurrentPeriod,
       totalIncomeDisplay: accumIncomeForCurrentPeriod,
+      cashBalance: currentPeriodCashBalance,
     };
   }, [orders, manualTransactions, selectedPeriod]);
 
   const totalIncomeDisplay = monthlyRollData.totalIncomeDisplay;
-  const cashBalance = useMemo(() => {
-    if (selectedPeriod === '2026-09') {
-      return 234017500;
-    }
-    return totalIncomeDisplay - totalExpenses;
-  }, [selectedPeriod, totalIncomeDisplay, totalExpenses]);
+  const cashBalance = monthlyRollData.cashBalance;
 
   // Kerugian Stok Kadaluwarsa pada Periode Terpilih (Pencatatan kerugian barang, tidak memotong kas lagi)
   const expiredStockLoss = useMemo(() => {

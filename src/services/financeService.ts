@@ -31,33 +31,23 @@ export const STORAGE_KEY_MANUAL_TXS = 'meo_cafe_manual_txs';
 
 // Baseline data transaksi September & Oktober yang sudah tervalidasi
 export const BASE_TRANSACTIONS: TransactionRecord[] = [
-  // --- SEPTEMBER 2026 (Bulan Pertama Buka) ---
+  // --- SEPTEMBER 2026 (Bulan Pertama Buka - Karyawan Belum Dapat Gaji) ---
   {
     id: 'm-sep-0',
     date: '2026-09-01',
     description: 'Setoran Modal Usaha Kafe (Modal Awal Operasi)',
     category: 'Modal Awal',
     type: 'Pemasukan',
-    amount: 190101300,
+    amount: 190000000,
     isEditable: true,
-  },
-  {
-    id: 'm-sep-1',
-    date: '2026-09-02',
-    description: 'Gaji Karyawan Kasir (Cindy & Lulu - Rp 4.000.000/orang)',
-    category: 'Gaji Karyawan',
-    type: 'Pengeluaran',
-    amount: 8000000,
-    isEditable: true,
-    isRecurringAuto: true,
   },
   {
     id: 'm-sep-2',
     date: '2026-09-02',
-    description: 'Pengadaan Awal Bahan Baku & Biji Kopi Gayo',
+    description: 'Pengadaan Awal Bahan Baku Gudang September (23 Komoditas)',
     category: 'Bahan Baku',
     type: 'Pengeluaran',
-    amount: 29319500,
+    amount: 37291000,
     isEditable: true,
     isStockExpense: true,
     isRecurringAuto: false,
@@ -92,30 +82,8 @@ export const BASE_TRANSACTIONS: TransactionRecord[] = [
     isEditable: true,
     isRecurringAuto: false,
   },
-  {
-    id: 'm-sep-restock-cheddar',
-    date: '2026-09-22',
-    description: 'Restock Tambahan: Keju Cheddar Slice (1 pack - Darurat Sebelum Habis)',
-    category: 'Bahan Baku',
-    type: 'Pengeluaran',
-    amount: 35000,
-    isEditable: true,
-    isStockExpense: true,
-    isRecurringAuto: false,
-  },
-  {
-    id: 'm-sep-restock-cream',
-    date: '2026-09-23',
-    description: 'Restock Tambahan: Cooking Cream UHT (0.5 liter - Darurat Sebelum Habis)',
-    category: 'Bahan Baku',
-    type: 'Pengeluaran',
-    amount: 32500,
-    isEditable: true,
-    isStockExpense: true,
-    isRecurringAuto: false,
-  },
 
-  // --- OKTOBER 2026 (Bulan Berjalan) ---
+  // --- OKTOBER 2026 (Gaji Dimulai untuk 2 Kasir Lama Cindy & Lulu) ---
   {
     id: 'm-oct-restock-base',
     date: '2026-10-02',
@@ -170,10 +138,14 @@ export const BASE_TRANSACTIONS: TransactionRecord[] = [
 ];
 
 /**
- * Mendapatkan daftar 4 pengeluaran wajib bulanan otomatis (terpotong tgl 2)
- * untuk bulan tertentu (format YYYY-MM)
+ * Mendapatkan daftar pengeluaran wajib bulanan otomatis (terpotong tgl 2)
+ * untuk bulan tertentu (format YYYY-MM).
+ * Aturan Gaji Kasir:
+ * - September: Belum digaji (awal beroperasi).
+ * - Oktober: Digaji 2 kasir lama (Cindy & Lulu = Rp 8.000.000). Kasir baru di bulan pertamanya belum digaji.
+ * - November dan seterusnya: Kasir baru mulai digaji penuh bersama kasir lama (full kasir aktif).
  */
-export function generateAutoRecurringExpenses(period: string): TransactionRecord[] {
+export function generateAutoRecurringExpenses(period: string, activeKasirCount = 6): TransactionRecord[] {
   const [year, month] = period.split('-');
   const date = `${year}-${month}-02`;
   
@@ -184,8 +156,10 @@ export function generateAutoRecurringExpenses(period: string): TransactionRecord
   };
   const monthLabel = monthNames[month] || month;
 
-  return [
-    {
+  const result: TransactionRecord[] = [];
+
+  if (period === '2026-10') {
+    result.push({
       id: `auto-salary-${period}`,
       date,
       description: `Gaji Karyawan Kasir Bulan ${monthLabel} (Cindy & Lulu - Rp 4.000.000/orang)`,
@@ -194,7 +168,22 @@ export function generateAutoRecurringExpenses(period: string): TransactionRecord
       amount: 8000000,
       isEditable: true,
       isRecurringAuto: true,
-    },
+    });
+  } else if (period > '2026-10') {
+    const kasirCount = activeKasirCount > 0 ? activeKasirCount : 6;
+    result.push({
+      id: `auto-salary-${period}`,
+      date,
+      description: `Gaji Karyawan Kasir Bulan ${monthLabel} (${kasirCount} Kasir - Rp 4.000.000/orang)`,
+      category: 'Gaji Karyawan',
+      type: 'Pengeluaran',
+      amount: kasirCount * 4000000,
+      isEditable: true,
+      isRecurringAuto: true,
+    });
+  }
+
+  result.push(
     {
       id: `auto-utility-${period}`,
       date,
@@ -224,8 +213,10 @@ export function generateAutoRecurringExpenses(period: string): TransactionRecord
       amount: 1000000,
       isEditable: true,
       isRecurringAuto: true,
-    },
-  ];
+    }
+  );
+
+  return result;
 }
 
 /**
@@ -250,6 +241,27 @@ export function getSavedTransactions(): TransactionRecord[] {
           }
         });
 
+        // Pastikan m-sep-0 (Modal Awal: 190.000.000) dan m-sep-2 (Pengadaan September: 37.291.000) selalu sinkron
+        const baseSep0 = BASE_TRANSACTIONS.find(t => t.id === 'm-sep-0');
+        const sep0Idx = list.findIndex(t => t.id === 'm-sep-0');
+        if (baseSep0) {
+          if (sep0Idx >= 0) {
+            list[sep0Idx] = { ...list[sep0Idx], amount: baseSep0.amount, description: baseSep0.description };
+          } else {
+            list.unshift(baseSep0);
+          }
+        }
+
+        const baseSep2 = BASE_TRANSACTIONS.find(t => t.id === 'm-sep-2');
+        const sep2Idx = list.findIndex(t => t.id === 'm-sep-2');
+        if (baseSep2) {
+          if (sep2Idx >= 0) {
+            list[sep2Idx] = { ...list[sep2Idx], amount: baseSep2.amount, description: baseSep2.description };
+          } else {
+            list.push(baseSep2);
+          }
+        }
+
         // Pastikan m-oct-restock-base selalu tercatat dan sinkron dengan BASE_TRANSACTIONS
         const baseOct = BASE_TRANSACTIONS.find(t => t.id === 'm-oct-restock-base');
         const octIdx = list.findIndex(t => t.id === 'm-oct-restock-base');
@@ -260,6 +272,9 @@ export function getSavedTransactions(): TransactionRecord[] {
             list.push(baseOct);
           }
         }
+
+        // Hapus m-sep-1 (karyawan belum dapat gaji di bulan awal September) dan transaksi obsolete
+        list = list.filter(t => t.id !== 'm-sep-1' && t.id !== 'm-sep-restock-cheddar' && t.id !== 'm-sep-restock-cream');
 
         localStorage.setItem(STORAGE_KEY_MANUAL_TXS, JSON.stringify(list));
       }

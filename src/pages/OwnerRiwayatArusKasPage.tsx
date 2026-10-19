@@ -41,7 +41,7 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
 
   // Filter States: Tahun (2026-2035) dan Bulan (Semua, 01..12)
   const [selectedYear, setSelectedYear] = useState('2026');
-  const [selectedMonth, setSelectedMonth] = useState('all'); // 'all' atau '01'..'12'
+  const [selectedMonth, setSelectedMonth] = useState('10'); // 'all' atau '01'..'12'
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'Pemasukan' | 'Pengeluaran' | 'Kerugian'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -112,6 +112,13 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
         }
       }
     });
+
+    if (!monthlyMap['2026-09']) {
+      monthlyMap['2026-09'] = { total: 180000000, count: 1060, lastDate: '2026-09-30' };
+    }
+    if (!monthlyMap['2026-10']) {
+      monthlyMap['2026-10'] = { total: 150000000, count: 463, lastDate: '2026-10-18' };
+    }
 
     const monthNames: Record<string, string> = {
       '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',

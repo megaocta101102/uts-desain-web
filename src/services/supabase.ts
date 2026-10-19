@@ -841,23 +841,6 @@ class DatabaseService {
             };
           });
 
-          // User request #4: Sesuaikan pemasukan September 2026 agar +- Rp 100.000.000
-          // dan Oktober 2026 dibiarkan utuh
-          const octOrders = sanitized.filter(o => o.created_at && !o.created_at.startsWith('2026-09'));
-          const sepOrders = sanitized.filter(o => o.created_at && o.created_at.startsWith('2026-09'))
-            .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-          
-          let sepSum = 0;
-          const targetSepOrders: Order[] = [];
-          for (const ord of sepOrders) {
-            if (sepSum + ord.total_amount <= 100200000) {
-              sepSum += ord.total_amount;
-              targetSepOrders.push(ord);
-            }
-          }
-
-          const combinedOrders = [...octOrders, ...targetSepOrders];
-
           const localStored = localStorage.getItem(STORAGE_KEYS.ORDERS);
           let localList: Order[] = [];
           if (localStored) {
@@ -867,11 +850,11 @@ class DatabaseService {
             } catch {}
           }
           const existingIds = new Set(
-            combinedOrders.map(o => o.id).filter(Boolean).concat(combinedOrders.map(o => o.order_number).filter(Boolean))
+            sanitized.map(o => o.id).filter(Boolean).concat(sanitized.map(o => o.order_number).filter(Boolean))
           );
           const extraLocal = localList.filter(o => o && !existingIds.has(o.id) && !existingIds.has(o.order_number));
 
-          const allMergedOrders = [...extraLocal, ...combinedOrders].sort(
+          const allMergedOrders = [...extraLocal, ...sanitized].sort(
             (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
 
