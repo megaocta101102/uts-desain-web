@@ -14,7 +14,7 @@ import {
   ArrowUp
 } from 'lucide-react';
 import { Order } from '../types';
-import { db } from '../services/supabase';
+import { db, isRealCashierOrder } from '../services/supabase';
 import { formatCurrency } from '../services/config';
 import { ReceiptModal } from '../components/kasir/ReceiptModal';
 
@@ -58,6 +58,7 @@ export const KasirRiwayatPage: React.FC = () => {
   // Kasir POS hanya memantau satu hari (shift kerja hari ini). Hari berganti otomatis kosong lagi.
   const todayOrders = useMemo(() => {
     return orders
+      .filter(isRealCashierOrder)
       .filter((ord) => isToday(ord.created_at))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   }, [orders]);

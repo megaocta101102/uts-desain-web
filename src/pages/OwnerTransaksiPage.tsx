@@ -18,7 +18,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { Order } from '../types';
-import { db } from '../services/supabase';
+import { db, isRealCashierOrder } from '../services/supabase';
 import { formatCurrency } from '../services/config';
 import { ReceiptModal } from '../components/kasir/ReceiptModal';
 
@@ -178,9 +178,9 @@ export const OwnerTransaksiPage: React.FC = () => {
   // 3. Search bar (hanya muncul saat tanggal diklik): mencari waktu (jam/menit), no order, pelanggan, kasir, meja, menu
   const displayOrders = useMemo(() => {
     // Urutkan semua transaksi dari yang paling baru di atas
-    let result = [...orders].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
+    let result = orders
+      .filter(isRealCashierOrder)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     // Filter tanggal dari kalender jika dipilih
     if (selectedDate) {

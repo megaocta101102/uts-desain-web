@@ -11,7 +11,7 @@ import {
   Receipt
 } from 'lucide-react';
 import { Order, MenuItem } from '../types';
-import { db } from '../services/supabase';
+import { db, isRealCashierOrder } from '../services/supabase';
 import { formatCurrency } from '../services/config';
 
 type TimeRangeFilter = 'today' | 'this_week' | 'period' | 'all';
@@ -79,42 +79,36 @@ export const OwnerStatistikPage: React.FC = () => {
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     endOfWeek.setHours(23, 59, 59, 999);
 
-    return orders.filter((o) => {
-      if (!o.created_at) return false;
-      const orderDate = new Date(o.created_at);
+    return orders
+      .filter(isRealCashierOrder)
+      .filter((o) => {
+        if (!o.created_at) return false;
+        const orderDate = new Date(o.created_at);
 
-      if (timeRange === 'today') {
-        return isSameDay(orderDate, now);
-      }
-      if (timeRange === 'this_week') {
-        return orderDate >= startOfWeek && orderDate <= endOfWeek;
-      }
-      if (timeRange === 'period') {
-        const orderYear = o.created_at.slice(0, 4);
-        const orderMonth = o.created_at.slice(5, 7);
-        const matchesYear = selectedYear === 'all' || orderYear === selectedYear;
-        if (!matchesYear) return false;
-        if (selectedMonth === 'all') return true;
-        return orderMonth === selectedMonth;
-      }
-      return true; // 'all'
-    });
+        if (timeRange === 'today') {
+          return isSameDay(orderDate, now);
+        }
+        if (timeRange === 'this_week') {
+          return orderDate >= startOfWeek && orderDate <= endOfWeek;
+        }
+        if (timeRange === 'period') {
+          const orderYear = o.created_at.slice(0, 4);
+          const orderMonth = o.created_at.slice(5, 7);
+          const matchesYear = selectedYear === 'all' || orderYear === selectedYear;
+          if (!matchesYear) return false;
+          if (selectedMonth === 'all') return true;
+          return orderMonth === selectedMonth;
+        }
+        return true; // 'all'
+      });
   }, [orders, timeRange, selectedYear, selectedMonth]);
 
   // Key Metrics
   const totalRevenue = useMemo(() => {
-    const sum = filteredOrders
+    return filteredOrders
       .filter((o) => o.status !== 'dibatalkan')
       .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
-    if (sum === 0 && orders.length === 0) {
-      if (timeRange === 'period') {
-        if (selectedYear === '2026' && selectedMonth === '09') return 180000000;
-        if (selectedYear === '2026' && selectedMonth === '10') return 150000000;
-        if (selectedYear === '2026' && selectedMonth === 'all') return 330000000;
-      }
-    }
-    return sum;
-  }, [filteredOrders, orders.length, timeRange, selectedYear, selectedMonth]);
+  }, [filteredOrders]);
 
   const totalOrdersCount = useMemo(() => {
     return filteredOrders.filter((o) => o.status !== 'dibatalkan').length;

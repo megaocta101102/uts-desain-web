@@ -18,7 +18,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping, CartItem, SelectedTopping, OrderType, PaymentMethod, Order } from '../types';
-import { db, normalizeMenuCategory } from '../services/supabase';
+import { db, normalizeMenuCategory, isToppingCompatible } from '../services/supabase';
 import { formatCurrency, DEFAULT_CONFIG } from '../services/config';
 import { useAuth } from '../context/AuthContext';
 import { ReceiptModal } from '../components/kasir/ReceiptModal';
@@ -587,10 +587,8 @@ export const KasirPOSPage: React.FC = () => {
                 </h4>
                 <div className="space-y-2">
                   {toppings
-                    .filter(
-                      (t) =>
-                        t.category === 'all' ||
-                        t.category === toppingModalItem.category
+                    .filter((t) =>
+                      isToppingCompatible(t.category, toppingModalItem.category, toppingModalItem.type)
                     )
                     .map((top) => {
                       const isSelected = modalSelectedToppings.some((t) => t.id === top.id);

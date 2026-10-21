@@ -6,7 +6,7 @@ import {
   X,
 } from 'lucide-react';
 import { MenuItem, MenuCategory, Topping } from '../types';
-import { db, normalizeMenuCategory } from '../services/supabase';
+import { db, normalizeMenuCategory, isToppingCompatible } from '../services/supabase';
 import { formatCurrency, DEFAULT_CONFIG } from '../services/config';
 
 export const LandingPage: React.FC = () => {
@@ -304,10 +304,8 @@ export const LandingPage: React.FC = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {toppings
-                      .filter(
-                        (t) =>
-                          t.category === 'all' ||
-                          t.category === normalizeMenuCategory(selectedMenu.category, selectedMenu.type)
+                      .filter((t) =>
+                        isToppingCompatible(t.category, selectedMenu.category, selectedMenu.type)
                       )
                       .map((top) => (
                         <div
@@ -318,6 +316,13 @@ export const LandingPage: React.FC = () => {
                           <span className="text-blue-600 font-bold">+{formatCurrency(top.price)}</span>
                         </div>
                       ))}
+                    {toppings.filter((t) =>
+                      isToppingCompatible(t.category, selectedMenu.category, selectedMenu.type)
+                    ).length === 0 && (
+                      <div className="col-span-full py-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        Tidak ada topping khusus untuk varian menu ini.
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

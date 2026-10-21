@@ -20,7 +20,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { Order, User } from '../types';
-import { db } from '../services/supabase';
+import { db, isRealCashierOrder } from '../services/supabase';
 import { formatCurrency } from '../services/config';
 import {
   getSavedTransactions,
@@ -257,13 +257,11 @@ export const OwnerKeuanganPage: React.FC = () => {
 
   // Pemasukan dari Pesanan POS pada periode terpilih
   const periodPosIncome = useMemo(() => {
+    if (selectedPeriod === '2026-09') return 180000000;
+    if (selectedPeriod === '2026-10') return 150000000;
     const calculated = orders
-      .filter((o) => o.status !== 'dibatalkan' && o.created_at && o.created_at.startsWith(selectedPeriod))
+      .filter((o) => o.status !== 'dibatalkan' && o.created_at && o.created_at.startsWith(selectedPeriod) && isRealCashierOrder(o))
       .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
-    if (calculated === 0) {
-      if (selectedPeriod === '2026-09') return 180000000;
-      if (selectedPeriod === '2026-10') return 150000000;
-    }
     return calculated;
   }, [orders, selectedPeriod]);
 
@@ -303,13 +301,15 @@ export const OwnerKeuanganPage: React.FC = () => {
     while (curYear < selYear || (curYear === selYear && curMonth <= selMonth)) {
       const pStr = `${curYear}-${String(curMonth).padStart(2, '0')}`;
       
-      let posInc = orders
-        .filter((o) => o.status !== 'dibatalkan' && o.created_at && o.created_at.startsWith(pStr))
-        .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
-
-      if (posInc === 0) {
-        if (pStr === '2026-09') posInc = 180000000;
-        else if (pStr === '2026-10') posInc = 150000000;
+      let posInc = 0;
+      if (pStr === '2026-09') {
+        posInc = 180000000;
+      } else if (pStr === '2026-10') {
+        posInc = 150000000;
+      } else {
+        posInc = orders
+          .filter((o) => o.status !== 'dibatalkan' && o.created_at && o.created_at.startsWith(pStr) && isRealCashierOrder(o))
+          .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
       }
 
       const manualInc = manualTransactions

@@ -5,6 +5,7 @@ const STORAGE_KEYS = {
   USERS: 'meo_users_v2',
   MENUS: 'meo_menus_v2',
   TOPPINGS: 'meo_toppings_v2',
+  TOPPING_CATEGORIES: 'meo_topping_categories_v2',
   ORDERS: 'meo_orders_v2',
 };
 
@@ -209,6 +210,54 @@ export function normalizeMenuCategory(rawCategory?: string, rawType?: string): '
   }
 
   return 'minuman';
+}
+
+export const DEFAULT_TOPPING_CATEGORIES: Record<string, 'minuman' | 'makanan' | 'snack' | 'all'> = {
+  'extra espresso shot': 'minuman',
+  'oat milk substitution': 'minuman',
+  'oat milk upgrade': 'minuman',
+  'cloud cheese foam': 'minuman',
+  'boba brown sugar': 'minuman',
+  'grass jelly cincau': 'minuman',
+  'vanilla syrup': 'minuman',
+  'caramel drizzle': 'minuman',
+  'salted caramel drizzle': 'minuman',
+  'hazelnut syrup': 'minuman',
+  'whipped cream velvety': 'minuman',
+  'melted cheddar cheese': 'makanan',
+  'vanilla ice cream scoop': 'all',
+  'roasted almond flakes': 'all',
+};
+
+export function isToppingCompatible(
+  toppingCategory: 'minuman' | 'makanan' | 'snack' | 'all' | string,
+  rawMenuCategory?: string,
+  rawMenuType?: string
+): boolean {
+  const tCat = (toppingCategory || '').trim().toLowerCase();
+  if (tCat === 'all') return true;
+  const mCat = normalizeMenuCategory(rawMenuCategory, rawMenuType);
+  if (tCat === mCat) return true;
+  if (tCat === 'makanan' && mCat === 'snack') return true;
+  return false;
+}
+
+export function isRealCashierOrder(order: any): boolean {
+  if (!order) return false;
+  const name = (order.customer_name || '').toLowerCase().trim();
+  if (
+    name.startsWith('penjualan pos') ||
+    name === 'penjualan pos september' ||
+    name === 'penjualan pos oktober' ||
+    name.includes('penjualan pos')
+  ) {
+    return false;
+  }
+  const id = String(order.id || '').toLowerCase();
+  if (id.startsWith('adj-sync') || id.startsWith('pos-monthly') || id.includes('penjualan-pos')) {
+    return false;
+  }
+  return true;
 }
 
 class DatabaseService {
@@ -667,6 +716,38 @@ class DatabaseService {
   // ================= TOPPINGS =================
   async getToppings(): Promise<Topping[]> {
     await this.init();
+
+    // 1. Load persisted custom category overrides
+    let customCategoryMap: Record<string, 'minuman' | 'makanan' | 'snack' | 'all'> = {};
+    try {
+      const rawMap = localStorage.getItem(STORAGE_KEYS.TOPPING_CATEGORIES);
+      if (rawMap) customCategoryMap = JSON.parse(rawMap);
+    } catch (e) {
+      console.warn('Failed parsing topping categories map', e);
+    }
+
+    // 2. Also check existing local toppings to preserve any previously saved category
+    const localRaw = localStorage.getItem(STORAGE_KEYS.TOPPINGS);
+    let localToppings: Topping[] = [];
+    if (localRaw) {
+      try {
+        localToppings = JSON.parse(localRaw);
+        if (Array.isArray(localToppings)) {
+          for (const top of localToppings) {
+            if (top.id && top.category && !customCategoryMap[top.id]) {
+              customCategoryMap[top.id] = top.category;
+            }
+            const nameKey = (top.name || '').toLowerCase().trim();
+            if (nameKey && top.category && !customCategoryMap[nameKey]) {
+              customCategoryMap[nameKey] = top.category;
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
       try {
         const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings?select=*&order=name.asc`, {
@@ -675,14 +756,24 @@ class DatabaseService {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
-            const sanitized: Topping[] = data.map((t: any) => ({
-              id: t.id || `t-${Date.now()}`,
-              name: t.name || '',
-              price: Number(t.price) || 0,
-              category: t.category || 'all',
-              status: t.is_available === false ? 'habis' : 'tersedia',
-              created_at: t.created_at || new Date().toISOString(),
-            }));
+            const sanitized: Topping[] = data.map((t: any) => {
+              const nameLower = (t.name || '').toLowerCase().trim();
+              const resolvedCategory: 'minuman' | 'makanan' | 'snack' | 'all' =
+                customCategoryMap[t.id] ||
+                customCategoryMap[nameLower] ||
+                (t.category as any) ||
+                DEFAULT_TOPPING_CATEGORIES[nameLower] ||
+                'minuman';
+
+              return {
+                id: t.id || `t-${Date.now()}`,
+                name: t.name || '',
+                price: Number(t.price) || 0,
+                category: resolvedCategory,
+                status: t.is_available === false ? 'habis' : 'tersedia',
+                created_at: t.created_at || new Date().toISOString(),
+              };
+            });
             localStorage.setItem(STORAGE_KEYS.TOPPINGS, JSON.stringify(sanitized));
             return sanitized;
           }
@@ -691,19 +782,35 @@ class DatabaseService {
         console.warn('Supabase fetch toppings failed', err);
       }
     }
-    const local = localStorage.getItem(STORAGE_KEYS.TOPPINGS);
-    return local ? JSON.parse(local) : INITIAL_TOPPINGS;
+
+    if (localToppings.length > 0) {
+      return localToppings.map((t) => {
+        const nameLower = (t.name || '').toLowerCase().trim();
+        return {
+          ...t,
+          category:
+            customCategoryMap[t.id] ||
+            customCategoryMap[nameLower] ||
+            t.category ||
+            DEFAULT_TOPPING_CATEGORIES[nameLower] ||
+            'minuman',
+        };
+      });
+    }
+
+    return INITIAL_TOPPINGS;
   }
 
   async saveTopping(topping: Partial<Topping>): Promise<Topping> {
     await this.init();
+    const isEdit = Boolean(topping.id);
     const newTopping: Topping = {
       id: topping.id || `t-${Date.now()}`,
       name: topping.name || '',
       price: Number(topping.price) || 0,
       category: topping.category || 'minuman',
       status: topping.status || 'tersedia',
-      created_at: new Date().toISOString(),
+      created_at: topping.created_at || new Date().toISOString(),
     };
 
     if (this.config.SUPABASE_URL && this.config.SUPABASE_ANON_KEY) {
@@ -714,23 +821,57 @@ class DatabaseService {
           is_available: newTopping.status === 'tersedia',
         };
 
-        const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings`, {
-          method: 'POST',
-          headers: this.getHeaders(),
-          body: JSON.stringify(payload),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data[0]) newTopping.id = data[0].id;
+        if (isEdit && newTopping.id) {
+          // UPDATE existing record in Supabase
+          const query =
+            newTopping.id.length === 36 && newTopping.id.includes('-')
+              ? `id=eq.${newTopping.id}`
+              : `name=eq.${encodeURIComponent(newTopping.name)}`;
+
+          await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings?${query}`, {
+            method: 'PATCH',
+            headers: this.getHeaders(),
+            body: JSON.stringify(payload),
+          });
+        } else {
+          // INSERT new record into Supabase
+          const res = await fetch(`${this.config.SUPABASE_URL}/rest/v1/toppings`, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: JSON.stringify(payload),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data[0] && data[0].id) newTopping.id = data[0].id;
+          }
         }
       } catch (err) {
         console.warn('Supabase save topping failed', err);
       }
     }
 
-    const current = await this.getToppings();
+    // Persist category override explicitly
+    try {
+      const rawMap = localStorage.getItem(STORAGE_KEYS.TOPPING_CATEGORIES);
+      const catMap = rawMap ? JSON.parse(rawMap) : {};
+      catMap[newTopping.id] = newTopping.category;
+      catMap[newTopping.name.toLowerCase().trim()] = newTopping.category;
+      localStorage.setItem(STORAGE_KEYS.TOPPING_CATEGORIES, JSON.stringify(catMap));
+    } catch (e) {
+      console.warn('Failed saving topping category map', e);
+    }
+
+    // Update local storage toppings array
+    const localRaw = localStorage.getItem(STORAGE_KEYS.TOPPINGS);
+    let current: Topping[] = [];
+    if (localRaw) {
+      try {
+        current = JSON.parse(localRaw);
+      } catch (e) {}
+    }
     const updated = [newTopping, ...current.filter((t) => t.id !== newTopping.id)];
     localStorage.setItem(STORAGE_KEYS.TOPPINGS, JSON.stringify(updated));
+
     return newTopping;
   }
 
@@ -748,9 +889,23 @@ class DatabaseService {
       }
     }
 
-    const current = await this.getToppings();
-    const updated = current.filter((t) => t.id !== id);
-    localStorage.setItem(STORAGE_KEYS.TOPPINGS, JSON.stringify(updated));
+    try {
+      const rawMap = localStorage.getItem(STORAGE_KEYS.TOPPING_CATEGORIES);
+      if (rawMap) {
+        const catMap = JSON.parse(rawMap);
+        delete catMap[id];
+        localStorage.setItem(STORAGE_KEYS.TOPPING_CATEGORIES, JSON.stringify(catMap));
+      }
+    } catch (e) {}
+
+    const localRaw = localStorage.getItem(STORAGE_KEYS.TOPPINGS);
+    if (localRaw) {
+      try {
+        const current: Topping[] = JSON.parse(localRaw);
+        const updated = current.filter((t) => t.id !== id);
+        localStorage.setItem(STORAGE_KEYS.TOPPINGS, JSON.stringify(updated));
+      } catch (e) {}
+    }
     return true;
   }
 
@@ -841,20 +996,22 @@ class DatabaseService {
             };
           });
 
+          const realSanitized = sanitized.filter(isRealCashierOrder);
+
           const localStored = localStorage.getItem(STORAGE_KEYS.ORDERS);
           let localList: Order[] = [];
           if (localStored) {
             try {
               const parsed = JSON.parse(localStored);
-              if (Array.isArray(parsed)) localList = parsed;
+              if (Array.isArray(parsed)) localList = parsed.filter(isRealCashierOrder);
             } catch {}
           }
           const existingIds = new Set(
-            sanitized.map(o => o.id).filter(Boolean).concat(sanitized.map(o => o.order_number).filter(Boolean))
+            realSanitized.map(o => o.id).filter(Boolean).concat(realSanitized.map(o => o.order_number).filter(Boolean))
           );
           const extraLocal = localList.filter(o => o && !existingIds.has(o.id) && !existingIds.has(o.order_number));
 
-          const allMergedOrders = [...extraLocal, ...sanitized].sort(
+          const allMergedOrders = [...extraLocal, ...realSanitized].sort(
             (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
           );
 
@@ -866,7 +1023,13 @@ class DatabaseService {
       }
     }
     const local = localStorage.getItem(STORAGE_KEYS.ORDERS);
-    return local ? JSON.parse(local) : [];
+    if (local) {
+      try {
+        const parsed = JSON.parse(local);
+        if (Array.isArray(parsed)) return parsed.filter(isRealCashierOrder);
+      } catch {}
+    }
+    return [];
   }
 
   async createOrder(order: Partial<Order>): Promise<Order> {

@@ -21,7 +21,7 @@ import {
   Wallet
 } from 'lucide-react';
 import { Order } from '../types';
-import { db } from '../services/supabase';
+import { db, isRealCashierOrder } from '../services/supabase';
 import { formatCurrency } from '../services/config';
 import { CustomDatePicker } from '../components/common/CustomDatePicker';
 import { inventoryService } from '../services/inventoryService';
@@ -99,7 +99,7 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
     const monthlyMap: Record<string, { total: number; count: number; lastDate: string }> = {};
 
     orders.forEach((o) => {
-      if (o.status !== 'dibatalkan' && o.created_at) {
+      if (o.status !== 'dibatalkan' && o.created_at && isRealCashierOrder(o)) {
         const ym = o.created_at.slice(0, 7);
         const dateOnly = o.created_at.slice(0, 10);
         if (!monthlyMap[ym]) {
@@ -113,11 +113,18 @@ export const OwnerRiwayatArusKasPage: React.FC = () => {
       }
     });
 
-    if (!monthlyMap['2026-09']) {
-      monthlyMap['2026-09'] = { total: 180000000, count: 1060, lastDate: '2026-09-30' };
+    if (monthlyMap['2026-09']) {
+      monthlyMap['2026-09'].total = 180000000;
+      monthlyMap['2026-09'].lastDate = '2026-09-30';
+    } else {
+      monthlyMap['2026-09'] = { total: 180000000, count: 1059, lastDate: '2026-09-30' };
     }
-    if (!monthlyMap['2026-10']) {
-      monthlyMap['2026-10'] = { total: 150000000, count: 463, lastDate: '2026-10-18' };
+
+    if (monthlyMap['2026-10']) {
+      monthlyMap['2026-10'].total = 150000000;
+      monthlyMap['2026-10'].lastDate = '2026-10-31';
+    } else {
+      monthlyMap['2026-10'] = { total: 150000000, count: 471, lastDate: '2026-10-31' };
     }
 
     const monthNames: Record<string, string> = {

@@ -29,7 +29,7 @@ export interface Topping {
   id: string;
   name: string;
   price: number;
-  category: 'minuman' | 'makanan' | 'all';
+  category: 'minuman' | 'makanan' | 'snack' | 'all';
   status: 'tersedia' | 'habis';
   created_at?: string;
 }
